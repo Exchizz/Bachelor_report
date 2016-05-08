@@ -110,6 +110,7 @@ Different types of functions can be seen in code \ref{code:function_defines}
 
 Table \ref{tab:fid_descriptions} describes the FIDs shown in listing \ref{code:function_defines}. \\
 
+\Mathias{Dette er forkert, eftersom alle defines er taget fra AQ's can.h så der passer det..}
 If a message is if FID CAN\_FID\_CMD, the Data Object code will be used as the command.\\
 It should be noted from code \ref{code:function_defines} that the FID's is moved 25 positions to the left but FID is shown in table \ref{tab:can_identifier_bits} is at bits 22:25. 
 The offset of three bits is due to the way ARM's CAN registers is implemented. The three initial bits in CAN\_TIxR and CAN\_RIxR (registers used to transmit and receive respectively) \footnote{\url{http://www2.st.com/content/ccc/resource/technical/document/reference_manual/59/b9/ba/7f/11/af/43/d5/CD00171190.pdf/files/CD00171190.pdf/jcr:content/translations/en.CD00171190.pdf:688}} registers are general information about the CAN messages like whether it is extended (Part B.0) or not.
@@ -249,18 +250,84 @@ CAN\_CMD\_TELEM\_RATE is the requested telemtry rate from AQ. Default is 10 hz \
 A timeout timer is started when each message has been sent. 
 If an ACK is not received after each message within 250 ms \footnote{https://github.com/bn999/autoquad/blob/master/onboard/can.h:71} a timeout counter is incremented. At the time of writing this information is not used but might be later on.\\
 
+\subsection{Registering node test}
+Implementation of a CAN-node running on a PC was initially done in python. The python module \textit{SocketCan} \footnote{\url{http://python-can.readthedocs.io/en/latest/socketcan_native.html}} supports PeakCAN adapter out of the box.\\
+
+Code \ref{code:python_reg_node} shows a snippet of main.py.
+
+\begin{lstlisting}[language = python, caption = Snippet showing AQ registration from python, label=code:python_reg_node]
+# Create autoquad handle
+autoquadNode = AutoQuadNode('can1', 'socketcan')
+
+# Wait for reset msg transmitted by AQ.
+autoquadNode.WaitForReset(timeout=1000);
+print "Recevied readymsg"
+
+# Register node, CanType as sensor and CanID as PDB ampere
+msg = autoquadNode.RegisterNode(CAN_TYPE_SENSOR, CAN_SENSORS_PDB_BATA)
+
+# Wait for telemetryTryValue
+msg = autoquadNode.recv()
+# Parse message
+msg = CanMessage(msg)
+
+# Print all values received, _str__(self) overwrited
+print msg
+
+# ACK TelemValue
+autoquadNode.AnswerRequestTelemValue(msg)
+
+# Wait for telemetryRate
+msg = autoquadNode.recv()
+
+# Parse message
+msg = CanMessage(msg)
+
+# ACK TelemRate
+autoquadNode.AnswerRequestTelemRate(msg)
+\end{lstlisting}
+
+The code in \ref{code:python_reg_node} was further developed into a sensor simulator that spoofs current measurements into AQ to test the registering works probably. \\
+When an AQ PDB is mounted on a drone, the PDB measures voltage, current and temperature. A logger extension-board was mounted on the M4-board in order to save the measurements to a MicroSD-card.
+
+Code \ref{code:spoof_current} shows the implementation where a Sinus is generated to simulate a current and how it is transmitted to AQ.
+
+\begin{lstlisting}[language = python, caption = Snippet spoofing current measurements into AQ, label=code:spoof_current]
+def ReqistrerTelem(self):
+	# self.sinus is just a list of sinus values
+	sensor_value = self.sinus[self.phase]
+
+	# Get next value next time and do overrun
+	self.phase+=1
+	self.phase = self.phase % 20
+
+	# Pack as IEEE754 float
+	sensor_value_float = pack('>f', sensor_value)
+
+	# Create list of float-bytes as integers
+	data_float = [int(ord(elm)) for elm in sensor_value_float]
+
+	# Reverse list and append empty data
+	data_float.reverse()
+	
+	# Send to AQ. id =  CAN_FID_TELEM (02c00000) | Sourceid 1 (00000800) | CAN_SENSORS_PDB_BATA (00004000)
+	self.send(0x02c04800, data_float)
+\end{lstlisting}
+
+The method defined in code \ref{code:spoof_current} was run every 100ms.\\
+After the code ran for a few seconds the SD card was plugged into a PC and QgroundStation configured to make a plot of the PDB\_CURRENT-field. The plot can be seen in figure \ref{fig:pdb_current_log} 
 
 
-\Mathias{Test of sending sensor data}
 \begin{figure}[H]
     \center
     \includegraphics[width=0.8\textwidth]{graphics/test_can_spoof_current.png}
     \caption{Test of python CAN test}
-    \label{fig:PCB_block}
+    \label{fig:pdb_current_log}
 \end{figure}
 
+Figure \ref{fig:pdb_current_log} shows the sinus generated from the node as expected.
 
-\subsection{Registering node test}
+\newpage
 \begin{figure}[H]
     \center
     \includegraphics[width=0.5\textwidth]{graphics/test_register_node.png}
