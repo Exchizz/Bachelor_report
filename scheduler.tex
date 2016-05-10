@@ -1,0 +1,55 @@
+\subsection{Test of RTCS}
+In order to test the timing of the scheduler, a led\_task was written. The task can be seen in code \ref{code:test_scheduler}
+\begin{lstlisting}[language = c, caption = RTCS task used in timing test, label=code:test_scheduler]
+void is_alive_task(uint8_t my_state){
+
+	// Write to UART0
+	UDR0 = my_state+'0';
+
+	switch(my_state){
+	case 0:
+		INT_LED_ON_GREEN;
+		INT_LED_OFF_RED;
+		INT_LED_OFF_BLUE;
+	    set_state( 1 );
+		break;
+	case 1:
+		INT_LED_OFF_GREEN;
+		INT_LED_ON_RED;
+		INT_LED_OFF_BLUE;
+	    set_state( 2 );
+		break;
+	case 2:
+		INT_LED_OFF_GREEN;
+		INT_LED_OFF_RED;
+		INT_LED_ON_BLUE;
+
+		// Set next state
+	    set_state( 0 );
+		break;
+	}
+	// Wait one second
+	wait( 1000 );
+}
+\end{lstlisting}
+
+The test was done by writing the current state of the task to UART0.\\ A python script were made that measures the time between each character received. The script can be seen in code \ref{code:test_rtcs_python}.
+\begin{lstlisting}[language = python, caption = Python code used to measure time between received byte, label=code:test_rtcs_python]
+#!/usr/bin/python
+import serial
+import time
+
+ser = serial.Serial( port='/dev/ttyUSB0', baudrate=57600 )
+
+t = time.time()
+while True:
+    for char in ser.read(1):
+        print time.time() - t, ","
+        t = time.time()
+
+ser.close()
+\end{lstlisting}
+The output of the script were redirected to a file. After receiving 700 bytes the standard deviation and mean was calculated using matlab.
+The mean is 1.0089 sec with a standard deviation of 0.0042 sec.
+
+It can be concluded that the scheduler performs well.
