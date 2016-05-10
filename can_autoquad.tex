@@ -168,7 +168,7 @@ Eg. When FID is CAN\_FID\_REQ\_ADDR, data has the fields shown in table \ref{tab
 \centering
 \caption{Packet sent from node when registering in AQ}
 \label{tab:packet_from_node}
-\begin{tabularx}{0.9\textwidth}{@{}|X|X|X|X|X|X|X|X|@{}}
+\begin{tabularx}{0.92\textwidth}{@{}|X|X|X|X|X|X|X|X|@{}}
 \toprule
 \multicolumn{8}{|c|}{64 bits}                           \\ \midrule
 0 & 0 & CanId & CanType & UUID3 & UUID2 & UUID1 & UUID0 \\
@@ -250,7 +250,22 @@ CAN\_CMD\_TELEM\_RATE is the requested telemtry rate from AQ. Default is 10 hz \
 A timeout timer is started when each message has been sent. 
 If an ACK is not received after each message within 250 ms \footnote{https://github.com/bn999/autoquad/blob/master/onboard/can.h:71} a timeout counter is incremented. At the time of writing this information is not used but might be later on.\\
 
-\subsection{Registering node test}
+Code in \ref{code:aq_req_extend_time} shows a snippet\footnote{\url{https://github.com/bn999/autoquad/blob/master/onboard/can.c:547}} from AQ where AQ waits for nodes to request an address.
+
+\begin{lstlisting}[language = c, caption = Snippet showing AQ waits for devices, label=code:aq_req_extend_time]
+canResetBus();
+
+// wait 100ms for nodes to report in
+micros = timerMicros() + 100000;
+while (timerMicros() < micros)
+    // extend wait period if more nodes found
+    if (canCheckMessage(0))
+        micros = timerMicros() + 100000;
+\end{lstlisting}
+
+AQ waits default 100 ms for nodes to request an address. If canProcessMessage() returns true a node tried to register and the registration period is extended 100 ms.
+ 
+\subsection{Registering node test} \label{sec:reg_node_test}
 Implementation of a CAN-node running on a PC was initially done in python. The python module \textit{SocketCan} \footnote{\url{http://python-can.readthedocs.io/en/latest/socketcan_native.html}} supports PeakCAN adapter out of the box.\\
 
 Code \ref{code:python_reg_node} shows a snippet of main.py.
@@ -287,14 +302,26 @@ msg = CanMessage(msg)
 autoquadNode.AnswerRequestTelemRate(msg)
 \end{lstlisting}
 
-The code in \ref{code:python_reg_node} was further developed into a sensor simulator that spoofs current measurements into AQ to test the registering works probably. \\
-When an AQ PDB is mounted on a drone, the PDB measures voltage, current and temperature. A logger extension-board was mounted on the M4-board in order to save the measurements to a MicroSD-card.
+When a node has successfully registered, it is shown in QgroundStation as shown in figure \ref{fig:successful_register}.
+It can be seen 4 motors were connected to the CAN bus, but also that the spoofed sensor was registered.
 
-Code \ref{code:spoof_current} shows the implementation where a Sinus is generated to simulate a current and how it is transmitted to AQ.
+\begin{figure}[H]
+    \center
+    \includegraphics[width=0.5\textwidth]{graphics/test_register_node.png}
+    \caption{Successful SENSOR registration}
+    \label{fig:successful_register}
+\end{figure}
+
+\subsection{Spoofed current test}
+When an AQ PDB is mounted on a drone, the PDB measures voltage, current and temperature and sends the measurements to AQ where they get logged.\\
+The code in section \ref{sec:reg_node_test} was further developed into a sensor simulator that spoofs current measurements into AQ to test the registering works probably. \\
+A logger extension-board was mounted on the M4-board in order to save the measurements to a MicroSD-card.
+
+Code \ref{code:spoof_current} shows the implementation where a sinus is generated to simulate a current and how it is transmitted to AQ.
 
 \begin{lstlisting}[language = python, caption = Snippet spoofing current measurements into AQ, label=code:spoof_current]
 def ReqistrerTelem(self):
-	# self.sinus is just a list of sinus values
+	# self.sinus is a list of sinus values
 	sensor_value = self.sinus[self.phase]
 
 	# Get next value next time and do overrun
@@ -326,11 +353,3 @@ After the code ran for a few seconds the SD card was plugged into a PC and Qgrou
 \end{figure}
 
 Figure \ref{fig:pdb_current_log} shows the sinus generated from the node as expected.
-
-\newpage
-\begin{figure}[H]
-    \center
-    \includegraphics[width=0.5\textwidth]{graphics/test_register_node.png}
-    \caption{Test of python CAN test}
-    \label{fig:PCB_block}
-\end{figure}
