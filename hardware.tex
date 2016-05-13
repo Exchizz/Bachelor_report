@@ -91,3 +91,10 @@ UART0 was made accessable to be used as debug and programming of the ESP8266 boa
 The plan was to setup the AtMega as UART passthrough from UART0 to UART1.
 Due to a mistake\footnote{The wrong pair of MISO/MOSI pins where made available in the ISP-header. The correct pair of MISO/MOSI is also RXD0/TXD0 as alternative function} in the final schematic, both UART0 and UART1 where made accessable trough the ISP/debug header. 
 This ended up making it easier to program the ESP8266-board without using the AtMega as UART passthrough.
+
+ESP noteS:
+ - GPIO15 = bootmode, low for ...
+ - GPIO0 = flash mode
+ 
+ 
+ https://zoetrope.io/tech-blog/esp8266-bootloader-modes-and-gpio-state-startup
