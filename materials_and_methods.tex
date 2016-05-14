@@ -1,19 +1,38 @@
-Used git - used one git repo at the beginning but due to messy history it was later on split into x repos. The ideal solution would be to use branches but then again it is nice to keep code for PC, drone and WIFI separate and not mix it with the report.
+This chapter concerns the most important parts about how this project has been implemented. It has been split into several sections.
 
-Required materials for this project:
+\Mathias{Write shortly about the implementation Chapter}
+\Mathias{Less calculations on the drone, better to move to another computer/cluster with more power than the drone has available from its battery}
+\Mathias{Image of camera and drone seen from the side. Show what happens to the drones position estimation when it drifts down/up}
 
-\begin{itemize}
-	\item 4 AutoQuad Ladybird drones. 
-	\item 1 FullHD camera
-	\item 4 PCBs with MicroController, CAN-transiver and wireless communication
-	\item Test facilities
-	\item 4 Markers, one for each drone
-	\item Software
-	\item MarkerLocator(https://github.com/henrikmidtiby/MarkerLocator )
-	\item Python-can package
-	\item ST-LINK v2. Used for debugging AutoQuad
-	\item PEAK-CAN adapter, used during development
-	\item A computer running linux
-\end{itemize}
+\section{CAN implementation}
+\input{can_implementation}
+  can0  00000000   [0] 
+  can0  01C00000   [8]  EF BE AD DE 03 09 00 00
+  can0  0E000041   [6]  EF BE AD DE 00 00
+  can0  14CD0042   [2]  00 08
+  can0  14CC0043   [2]  0A 00
 
-\Mathias{Billede af AQ drone}
+
+
+seq tæller op så rate/value bliver acknowledged
+  can0  00000000   [0] 
+  can0  01C00000   [8]  EF BE AD DE 03 09 00 00
+  can0  0E000041   [6]  EF BE AD DE 00 00
+  can0  14CD0042   [2]  00 08
+  can0  00400002   [8]  00 00 00 00 00 00 00 00
+  can0  14CC0043   [2]  0A 00
+  can0  00400003   [8]  00 00 00 00 00 00 00 00
+
+
+\section{Communication flow}
+\input{communication_flow}
+
+\section{Vision based localization}
+\input{vision_localization}
+\newpage
+
+\section{Software}
+\input{scheduler}
+\section{Hardware}
+\input{hardware}
+\newpage
