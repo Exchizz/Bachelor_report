@@ -1,2 +1,37 @@
+In order to find relevant research about drones flying indoor search phrases was conducted.
+The following keywords were used to create different phases: Indoor, environment, swarm, localization, AutoQuad, quadrotor, mini UAV, test facilities, ETH.
+Based on the keywords a few papers was deemed relevant to the project and has been combined in order to give the reader an overview within the field of this project. \\
+
+
+Multiroters has started receiving a lot of considerable attention because of their advantages in a variety of applications\footcite{kang2015indoor}. It is quite intuitive to understand how multiroters work simply by changing the angular speed of each of the propellers. When it comes to controlling the angular speed of the roters the complexity increases and lots of different approaches has been suggested \footcite{luukkonen2011modelling}. \\
+
+
+One of the big players within the field of indoor navigation and controlling multiple drones is the university ETHzûrich and their Institute for Dynamic Systems and Modelling \footnote{\url{http://www.idsc.ethz.ch/research-dandrea/research-projects/aerial-construction.html}}. They have developed a test flying area they call "Flying Machine area" which provides facilities for doing prototype testing of new control algorithms \footcite{lupashin2014platform}. The FMAs dimensions is 10*10*10m and provides nets to protect people and mattresses to protect the drone  if a crash. The FMA has further been developed into a mobile installation to be used in demonstrations in Europe and North America. One of their demonstrations where used in a TED video about multiroters and their capabilities \footnote{https://www.ted.com/talks/raffaello\_d\_andrea\_the\_astounding\_athletic\_power\_of\_quadcopters}.
+The multiroter usually used in the FMA is Ascending Technologies' Hummingbird with custom wireless communication and electronics. \\
+They have build it as a module design in order to be easy to replace parts of their system by simulations and to make it scalable.
+One of their modules is a copilot that implements an accident handler in case of user-code crashing or sending invalid commands to the drones.
+They are using UDP multicast packets as communication between ground computation and flying objects. The use of UDP multicast packets between modules since to makes the system more simple but also to avoid the need of buffers to handle unsuccessful transmissions and retransmissions. \\
+In order to detect the quadroters they are using a commercial motion capture system. Three reflective markers is mounted on each flying object in order to obtain attitude and position. They are using three cameras to reduce the risk of false positive even though two cameras would be enough to get a flying objects 6D position.\\
+ 
+ 
+\cite{kang2015indoor} proposes a more simplistic approaches to do indoor navigation. They use bluetooth 4 to communicate between their multiroter(Rolling Spider) and an android phone which controls the multiroter. They have mounted a camera on the ceiling to detect the target and the flying multiroter. By doing background subtraction they can detect where the drone is in the frame by subtracting the background from each frame \footcite{wikiBackgroundsubtraction}. 
+By doing a convolution sum, the targets can be located. By analyzing the pixels around the location of the multiroter, they can get the heading.
+
+\cite{sanchez2014system}
+
+\newpage
+In \cite{stirling2012indoor} \url{http://www.youblob.com/sites/default/files/shop/SwarmIndoorNav2012.pdf}
+
+
+In \footcite{dijkshoorn2012simultaneous} \url{www.nickd.nl/dl/thesis\_Nick\_Dijkshoorn.pdf}
+
+
+\url{https://www.researchgate.net/profile/Markus_Achtelik/publication/224252743_Onboard_IMU_and_monocular_vision_based_control_for_MAVS_in_unknown_in-_and_outdoor_environments/links/0fcfd511cd7c244009000000.pdf}
+
+in \footcite{stirling2012indoor}
+
+
+
+
 
 
