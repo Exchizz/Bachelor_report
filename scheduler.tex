@@ -8,17 +8,31 @@ The list below shows 3 different types of scheduler that was considered.
 \end{itemize}
 The RTCS was chosen since it provides timing without the overhead created when doing context-switching and the need of mutex and semaphores. It further reduces the code-complexity.\\
 
+\Mathias{A little description about the scheduler implementation. Add tasks, and run the scheduler. Show how it waits for tick and the runs through all of the tasks that is in RUN state.}
+
 It was decided to implement the code in tasks to make a low coupling between the functionalities. This makes it easier to maintain and expand later of if needed. The task diagram shown in figure \ref{fig:task_diagram_atmega} shows the tasks and how they do intertask communication.
 
 
 \begin{figure}[H]
     \center
     \includegraphics[width=0.9\textwidth]{graphics/task_diagram.png}
-  \label{fig:task_diagram_atmega}
   \caption{Tasks diagram showing overview of the running tasks on the At90Can128}
+    \label{fig:task_diagram_atmega}
 \end{figure}
-
-
+A small description of each of the tasks is given below:
+\begin{itemize}
+\item \textbf{ is\_alive\_task} Toggles the green led to make sure the scheduler is running. In case of stack overflow, memoryleak or any other error, the Atmega will freeze and it will easily be detectable since the green led stops blinking
+\item \textbf{ uart0\_tx\_task} Responsible of sending characters in the uart0\_tx queue.
+\item \textbf{ uart0\_rx\_task} Responsible of checking if any characters in the uart-receive buffer is available. If any, put them into the uart0\_rx queue
+\item \textbf{ uart1\_tx\_task} Responsibile as uart\_0\_tx\_task
+\item \textbf{ uart1\_rx\_task} Responsibile as uart\_0\_rx\_task
+\item \textbf{ can\_rx\_task} Responsible of checking if a CAN-message is available in the MOB. If any put them into the CAN\_rx\_queue
+\item \textbf{ can\_tx\_task} Responsible of transmitting messages available in the CAN\_tx\_queue
+\item \textbf{ aq\_node\_task} Responsible of registering the node when AQ boots.
+\item \textbf{ task\_slip\_decode\_crc\_task} Responsible of removing SLIP characters and run CRC
+\item \textbf{ aq\_spoof\_task} Responsible of converting and transmitting received GPS messages from uart1.
+\end{itemize}
+\Mathias{Add description of slip and crc task, maybe also spoof and node, not sure..}
 
 \subsubsection*{Test of RTCS timing}
 In order to test the timing of the scheduler, a led\_task was written. The task can be seen in code \ref{code:test_scheduler}
