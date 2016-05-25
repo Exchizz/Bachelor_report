@@ -1,20 +1,5 @@
-\subsection{Introduction}
-This secion will go in depth about the extentionboard created as an addon to the AQ M4 board. The extentionboard was developed to act as a bridge between the PC and the CAN-bus using wireless communication.\\
+\textit{This secion will go in depth with the extension-board created as an addon to the AQ M4 board. The extension-board was developed to act as a bridge between the PC and the CAN-bus using wireless communication.} \\
 
-The block schematic shown in figure \ref{fig:PCB_block} was created by the auther. It was then given to Carsten Albertsen who created the schematic and did rest of the creation of the PCB. Some time was spend learning how to program the AtMega and ESP8266 but also on debugging since there was an error in the ISP pins. Later on the author had to make a correction to the board since a pin on the ESP8266 that had to be connected to ground.
-\\
-\subsection{Block schmeatic}
-\Mathias{Create schematic appendix}
-\Mathias{Add GPS, WIFI, PCB, PC to forkortelses liste}
-\Mathias{Thanks to Carsten Albertsen for PCB development}
-\begin{figure}[H]
-    \center
-    \includegraphics[width=1\textwidth]{graphics/PCB_block_v3.eps}
-    \caption{Block schematic of the WIFI-extentionboard developed to AQ M4}
-    \label{fig:PCB_block}
-\end{figure}
-
-\subsubsection{ATmega}
 \subsubsection{Wireless communication module}
 An important part of the hardware is the wireless communication used between the PC and the drones.
 The wireless communication module has severel requirements it needs to fulfill in order to make the whole system work as expected. A comparison table has been made in table \ref{tab:compare_table_wireless_communication} to find the wireless communication module that is best suited for the task. \\
@@ -50,21 +35,39 @@ XBee is a module that implements the Zbee standard. The Xbee modules work as a w
 The Xbee solution is ready to use and requires a minimum of programming to get up and running. The modules also support GPIO for digital in and output and analog input.
 
 \Mathias{ '\'footmotemark til at referere til samme fodnote flere gange}
+\begin{savenotes}
 \begin{table}[H]
 	\centering
 	\begin{tabular}{@{}|l|l|l|l|l|l|l|l|@{}}
 		\toprule
 		\textbf{Product} & \textbf{Size} & \textbf{Weight} & \textbf{Price} & \textbf{Documentation} &  \textbf{Range}  & \textbf{Score} \\ \midrule
-		ESP8266   &  24x16mm\footnote{\url{https://www.mikrocontroller.net/attachment/243558/fcc\_11.pdf}} \hfill\{7\} & 1.5g\footnote{Measured by author on chemistry weight} \hfill\{8\} &   7.5\$\footnote{\url{http://www.seeedstudio.com/depot/ESP8266-based-WiFi-module-SPI-supported-p-2486.html}}    &   Great community \hfill\{9\}  &    ?    &                		\\ \midrule
-		EMW3165   &  32x16mm\footnote{\url{https://hackadaycom.files.wordpress.com/2015/07/emw3165.pdf}} \hfill\{6\}  & 5g\footnote{\url{http://www.seeedstudio.com/depot/EMW3165-CortexM4-based-WiFi-SoC-Module-p-2488.html}} \hfill\{2\} &  9\$\footnote{\url{http://www.seeedstudio.com/depot/EMW3165-CortexM4-based-WiFi-SoC-Module-p-2488.html}}   &  Less available  \hfill\{3\}	        &    ?    &                		\\ \midrule
-		nRF51822  &  18x10mm\footnote{\url{http://www.fanstel.com/Product/bluenor.html}} \hfill\{8\}  & 3g\footnote{\url{http://www.seeedstudio.com/depot/MDBT40P\%C2\%A0\%C2\%A0nRF51822\%C2\%A0based\%C2\%A0BLE\%C2\%A0module-p-2503.html}} \hfill\{0\}  &  7.5\$  & Ok documented\hfill\{2\} 	        &   30 M\footnote{\url{https://dl.dropboxusercontent.com/u/54939426/Fanstel_BT600.pdf}}  \hfill\{9\}     &                		\\ \midrule
-		XBee      &  24.38x27.61mm \footnote{\url{http://www.digi.com/products/xbee-rf-solutions/modules/xbee-802-15-4\#specifications}} \{3\} & 3g \footnote{\url{http://www.digi.com/products/xbee-rf-solutions/modules/xbee-802-15-4\#specifications}} \hfill\{4\} &   25\$\footnote{\url{https://www.sparkfun.com/products/11215}}    &  Lots of DIY   \hfill\{9\}      &            91 M\footnote{\url{https://www.sparkfun.com/pages/xbee_guide}}  \hfill\{9\}  &                    \\ \bottomrule
+		ESP8266   &  24x16mm\footnote{\url{https://www.mikrocontroller.net/attachment/243558/fcc\_11.pdf} last visited 26 Maj} \hfill\{7\} & 1.5g\footnote{Measured by author on chemistry weight} \hfill\{8\} &   7.5\$\footnote{\url{http://www.seeedstudio.com/depot/ESP8266-based-WiFi-module-SPI-supported-p-2486.html} last visited 26 Maj}  \hfill\{9\}  &   Great community \hfill\{9\}  &    ?    &          33      		\\ \midrule
+		EMW3165   &  32x16mm\footnote{\url{https://hackadaycom.files.wordpress.com/2015/07/emw3165.pdf}last visited 26 Maj} \hfill\{6\}  & 5g\footnote{\url{http://www.seeedstudio.com/depot/EMW3165-CortexM4-based-WiFi-SoC-Module-p-2488.html} last visited 26 Maj} \hfill\{2\} &  9\$\footnote{\url{http://www.seeedstudio.com/depot/EMW3165-CortexM4-based-WiFi-SoC-Module-p-2488.html}} \hfill\{8\}   &  Less available  \hfill\{3\}	        &    ?    &    19            		\\ \midrule
+		nRF51822  &  18x10mm\footnote{\url{http://www.fanstel.com/Product/bluenor.html}last visited 26 Maj} \hfill\{8\}  & 3g\footnote{\url{http://www.seeedstudio.com/depot/MDBT40P\%C2\%A0\%C2\%A0nRF51822\%C2\%A0based\%C2\%A0BLE\%C2\%A0module-p-2503.html}last visited 26 Maj} \hfill\{4\}  &  7.5\$ \footnote{\url{http://www.seeedstudio.com/item_detail.html?p_id=2503} last visited 26 Maj} \hfill\{9\}   & Ok documented\hfill\{2\} 	        &   30 M\footnote{\url{https://dl.dropboxusercontent.com/u/54939426/Fanstel_BT600.pdf} last visited 26 Maj}  \hfill\{9\}     &               32 		\\ \midrule
+		XBee      &  24.38x27.61mm \footnote{\url{http://www.digi.com/products/xbee-rf-solutions/modules/xbee-802-15-4\#specifications}} \{3\} & 3g \footnote{\url{http://www.digi.com/products/xbee-rf-solutions/modules/xbee-802-15-4\#specifications} last visited 26 Maj} \hfill\{4\} &   25\$\footnote{\url{https://www.sparkfun.com/products/11215} last visited 26 Maj}  \hfill\{4\}  &  Lots of DIY   \hfill\{9\}      &            91 M\footnote{\url{https://www.sparkfun.com/pages/xbee_guide}}  \hfill\{9\}  &             29       \\ \bottomrule
 	\end{tabular}
 	\caption{Comparisontable used to compare different wireless 		communication modules}
 	\label{tab:compare_table_wireless_communication}
 \end{table}
-\Mathias{vægt på ESP til 3 gram med link - det er hvad der er oplyst. Efterfølgende skrive at det er vejet til 1.51 gram(hen mod slutningen)}
-The products compared in \ref{tab:compare_table_wireless_communication} are chosen to have approximately same specs. Onboard antenna, breakout for easy pin access.
+    \end{savenotes}
+
+The products compared in \ref{tab:compare_table_wireless_communication} are chosen to have approximately same specs such as onboard antenna and no need for extra components.
+The ESP8266 module based on the highest score but must of all because it is use in a wide range of applications and has a lot of activity on their official Arduino github. The weight of the module was measured after the decision was made. If it was heavier than the other modules it would still have been used due to the large number of projects using this module. In case help was needed to make the module work, plenty of projects is available online and they have an active forum\footnote{\url{http://www.esp8266.com/} last visited 26 Maj}
+
+\subsubsection{Microcontroller}
+The first requirement for the micro-controller mounted on the extension-board was that it has a build-in CAN-controller in order to communicate with the AQ M4 board. 
+The second requirement was that it has more than one UART to communicate with the ESP8266 and with a PC for debugging. 
+The AT90CAN128 was chosen since the author and SDU had experience programming and using that micro-controller
+Since the AT90CAN128 was already available in the authors supervisors FroboMindcontroller \footnote{\url{http://www.frobomind.org/index.php/FMCtrl:FroboMind\_Controller}}, the author could start developing the firmware while the PCB for the ladybirds were made.
+
+\subsubsection{Block Schematic}
+The block schematic shown in figure \ref{fig:PCB_block} was created by the author. It was then given to Carsten Albertsen who created the schematic and did rest of the creation of the PCB. Some time was spend  debugging since there was an error in the ISP pins. Later on the author had to make a correction to the board since a pin(GPIO15) on the ESP8266 that had to be grounded in order to select booting from the flash.
+\begin{figure}[H]
+    \center
+    \includegraphics[width=0.9\textwidth]{graphics/PCB_block_v3.eps}
+    \caption{Block schematic of the extension-board developed to AQ M4. It can be seen that the ESP8266 chip is connected to the At90CAN128 using UART1 and that the AtMega is connect to a can-transceiver which  communicates with the AQ M4 board.}
+    \label{fig:PCB_block}
+\end{figure}
 
 \subsubsection{Pins}
 A few pins where made available through solder pads for easy access if needed later on.
@@ -98,3 +101,28 @@ ESP noteS:
  
  
  https://zoetrope.io/tech-blog/esp8266-bootloader-modes-and-gpio-state-startup
+
+\subsubsection{Test of WIFI range}
+A test of the wifi was conducted in order to test the range of the ESP8266 module. Test of the AtMega is done in section \ref{sec:extensionboard_firmware}
+
+To make the test, the fimrware of the ESP8266 module had to be flashed to specify which access point it should connect to. How the networking was setup can be seen in section \ref{sec:server_configuration}.
+
+The first test was conducted by pinging the module from the authors laptop 200 times, 10 hz with a packet size of the dataframe used in the application.\footnote{See more about the size and content in section \ref{sec:shizzle}}. the purpose of the test was to see how the latency behaves when the distance is increased and when it stops receiving or transmitting packets.
+
+Figure \ref{fig:wifi_ping_test} shows the results.
+
+\Mathias{Billede af pingtest}
+
+Another test was done where the authors laptops sends datapackages to the ESP8266 module. The rests shows for how long a distance the module can be from the laptop and still receive valid packets. CRC-16 was used to validate the content of the packets. \footnote{See more about this in section \ref{sec: extensionboard_software}}
+
+
+\Mathias{figur af antal af valid crc pakker vs. distance}
+
+
+A final test was made to see how the modules behave when two modules are receiving the packets. At 10 hz datapackets was sent to two modules at a distance of 10 meters.
+\Mathias{Figure shows test from above}
+
+Both modules received their packets without CRC error.
+
+It can be concluded that the chosen wifi modules, ESP8266 works well. At a distance of 100 meters it drops.... and that .. and it indicates that the communication works when more than one ESP8266 is connected to the laptop using WIFI.
+
