@@ -163,7 +163,7 @@ However a double can easily handle that which makes the latitude and longitude o
 
 Only one decimal for rest of the values was deemed necessary and was thereby multiplied and divided by 10. \\
 
-To tell the UKF in AQ how much to believe in the GPS coordinates, the onboard GPS feeds the UKF with DOP factors. The DOP factors expresses how well the satellites are placed. If they are all located around the same spot, the DOP factors will be high since the triangulation becomes less accurate. The DOP factors has no unit but is simply a scaling of the error estimate. \footcite{kelddueholmmikkellaurentziusannab.o.jensen2015}
+To tell the UKF in AQ how much to believe in the GPS coordinates, the onboard GPS feeds the UKF with DOP factors. The DOP factors expresses how well the satellites are placed. If they are all located around the same spot, the DOP factors will be high since the triangulation becomes less accurate. The DOP factors has no unit but is simply a scaling of the error estimate. \cite{kelddueholmmikkellaurentziusannab.o.jensen2015}
 
 \Mathias{Insert image from normal flight}
 \newpage
@@ -186,11 +186,11 @@ Figure \ref{fig:dop_read_flight} shows a flight using onboard GPS where the DOP 
   \end{center}
 \end{wrapfigure}
 
-The pDOP was set to 1.75 times higher than the hDOP since it incorporates error from both vDOP and hDOP \footcite{kelddueholmmikkellaurentziusannab.o.jensen2015}. \\
-vDOP is usually 1.5-2 tims higher than hDOP.  \footcite{kelddueholmmikkellaurentziusannab.o.jensen2015}. \\
+The pDOP was set to 1.75 times higher than the hDOP since it incorporates error from both vDOP and hDOP \cite{kelddueholmmikkellaurentziusannab.o.jensen2015}. \\
+vDOP is usually 1.5-2 tims higher than hDOP.  \cite{kelddueholmmikkellaurentziusannab.o.jensen2015}. \\
 tDOP was sat to 1.5 higher than hDOP since timeerror causes position error. \footnote{\url{http://www.environmental-studies.de/GPS/Dilution-of-precision/dilution-of-precision.html} last visited 22 maj} \\
 Since hDOP can be split into nDOP and eDOP, they each of some of the error factor. \\
-\Mathias{Gdop, skal den ikke være højere siden den har både vDOP, hDOP og tDOP} \footcite{kelddueholmmikkellaurentziusannab.o.jensen2015}
+\Mathias{Gdop, skal den ikke være højere siden den har både vDOP, hDOP og tDOP} \cite{kelddueholmmikkellaurentziusannab.o.jensen2015}
 
 
 
@@ -219,8 +219,9 @@ figur der viser vele og veln der ikke virker.
 
 Ny test, samme måde som første test, dog med følgende resultater \footnote{fejlen skyltes forkert blevev hevet ud fra C++ vector samt en variabel var brugt forkerte sted.}
 
-\footcite{kelddueholmmikkellaurentziusannab.o.jensen2015}
+\cite{kelddueholmmikkellaurentziusannab.o.jensen2015}
 
 
 
 
+bstract.tex

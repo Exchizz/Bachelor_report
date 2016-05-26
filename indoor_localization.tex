@@ -88,7 +88,7 @@ During development of quality measures it was noted that if the MarkerLocator do
 
 \textbf{Perspective correction} \\
 In order to use centimeters as measure of the position of the markers and to correct if the camera is not pointing directly down, the build-in perspective correction in the MarkerLocator were used.
-It works by using homography\footcite{janeriksolem2012} to make the transformation from pixels to some chosen unit which in this case is centimeters.
+It works by using homography\cite{janeriksolem2012} to make the transformation from pixels to some chosen unit which in this case is centimeters.
 \begin{wrapfigure}{r}{0.5\textwidth}
   \vspace{-20pt}
   \begin{center}
@@ -112,3 +112,4 @@ Another test was conducted in order to see how stable the MarkerLocator is. 547 
 Some of this inaccuracy is caused by measuring error and placing of the whiteboard. If higher accuracy is needed this should be done again more carefully.
 
 It can be concluded that using the MarkerLocator with the improved order detection it is possible to detect two drones without having any false positive/negative. By making a test of the distance between two markers there is an error of 0.81 cm. The MarkerLocator seems stable with a variance of zero. 
+bstract.tex

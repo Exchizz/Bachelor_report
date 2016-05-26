@@ -55,9 +55,13 @@ The products compared in \ref{tab:compare_table_wireless_communication} are chos
 The ESP8266 module based on the highest score but must of all because it is use in a wide range of applications and has a lot of activity on their official Arduino github. The weight of the module was measured after the decision was made. If it was heavier than the other modules it would still have been used due to the large number of projects using this module. In case help was needed to make the module work, plenty of projects is available online and they have an active forum\footnote{\url{http://www.esp8266.com/} last visited 26 Maj}
 
 \subsubsection{Microcontroller}
-The first requirement for the micro-controller mounted on the extension-board was that it has a build-in CAN-controller in order to communicate with the AQ M4 board. 
-The second requirement was that it has more than one UART to communicate with the ESP8266 and with a PC for debugging. 
-The AT90CAN128 was chosen since the author and SDU had experience programming and using that micro-controller
+The list below shows the requirement for the microcontroller on the extension-board.
+\begin{itemize}
+	\item \textbf{CAN-controller} to communicate with the AQ M4 board.
+	\item \textbf{2 UART} to communicate with the ESP8266-module and with a PC for debugging purpose.
+\end{itemize}
+
+The AT90CAN128 was chosen since the author and SDU had experience programming and using that microcontroller.
 Since the AT90CAN128 was already available in the authors supervisors FroboMindcontroller \footnote{\url{http://www.frobomind.org/index.php/FMCtrl:FroboMind\_Controller}}, the author could start developing the firmware while the PCB for the ladybirds were made.
 
 \subsubsection{Block Schematic}
@@ -105,7 +109,7 @@ ESP noteS:
 \subsubsection{Test of WIFI range}
 A test of the wifi was conducted in order to test the range of the ESP8266 module. Test of the AtMega is done in section \ref{sec:extensionboard_firmware}
 
-To make the test, the fimrware of the ESP8266 module had to be flashed to specify which access point it should connect to. How the networking was setup can be seen in section \ref{sec:server_configuration}.
+To make the test, the fimrware of the ESP8266 module had to be flashed to specify which access point it should connect to. How the networking was configured can be seen in section \ref{sec:server_configuration}.
 
 The first test was conducted by pinging the module from the authors laptop 200 times, 10 hz with a packet size of the dataframe used in the application.\footnote{See more about the size and content in section \ref{sec:shizzle}}. the purpose of the test was to see how the latency behaves when the distance is increased and when it stops receiving or transmitting packets.
 
@@ -126,3 +130,4 @@ Both modules received their packets without CRC error.
 
 It can be concluded that the chosen wifi modules, ESP8266 works well. At a distance of 100 meters it drops.... and that .. and it indicates that the communication works when more than one ESP8266 is connected to the laptop using WIFI.
 
+bstract.tex

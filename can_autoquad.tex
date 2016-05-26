@@ -317,7 +317,7 @@ When an AQ PDB is mounted on a drone, the PDB measures voltage, current and temp
 The code in section \ref{sec:reg_node_test} was further developed into a sensor simulator that spoofs current measurements into AQ to test the registering works probably. \\
 A logger extension-board was mounted on the M4-board in order to save the measurements to a MicroSD-card.
 
-Code \ref{code:spoof_current} shows the implementation where a sinus is generated to simulate a current and how it is transmitted to AQ. \footcite{someguy2993}
+Code \ref{code:spoof_current} shows the implementation where a sinus is generated to simulate a current and how it is transmitted to AQ. \cite{someguy2993}
 
 \begin{lstlisting}[language = python, caption = Snippet spoofing current measurements into AQ, label=code:spoof_current]
 def ReqistrerTelem(self):
@@ -353,3 +353,4 @@ After the code ran for a few seconds the SD card was plugged into a PC and Qgrou
 \end{figure}
 
 Figure \ref{fig:pdb_current_log} shows the sinus generated from the node as expected.
+bstract.tex

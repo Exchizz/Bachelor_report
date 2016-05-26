@@ -38,6 +38,7 @@
 % --------------- Code ----------------- %
 \usepackage{verbatim}
 \usepackage{listings}
+\DeclareUnicodeCharacter{00A0}{ }
 \lstset{
 	frame				= lines,
   	language				= C++,
@@ -190,13 +191,18 @@
 \def\UrlFont{}
 \usepackage{cleveref}
 %\usepackage[numbers, square, comma, sort&compress]{natbib}
+%\usepackage[round,numbers]{natbib}
+%\usepackage{tex}
+%\usepackage[backend=bibtex,style=numeric]{biblatex}
+%\usepackage[
+%  backend=natbib,
+ %style=alpabethical,
+%  citestyle=verbose%-tcomp
+%  ]{biblatex}
+\usepackage[square,numbers]{natbib}
+%\usepackage{biblatex}
 
-\usepackage[
-  backend=bibtex,
-  %style=alpabethical,
-  citestyle=verbose%-tcomp
-  ]{biblatex}
-\bibliography{bibliography} 
+%\bibliography{bibliography} 
 
 \usepackage[hang,flushmargin]{footmisc}
 \usepackage{footnote}
@@ -282,7 +288,8 @@
 \newpage
 \listoftables
 %\endgroup
-\printbibliography
+%\printbibliography
+\bibliography{bibliography}
 \begin{appendices}
 \makeatletter
 \addtocontents{toc}{\let\protect\l@chapter\protect\l@section}
@@ -295,6 +302,7 @@
 
 
 %\bibliographystyle{ieeetr}
+\bibliographystyle{IEEEbib}
 %\bibliography{bibliography}
 
 
