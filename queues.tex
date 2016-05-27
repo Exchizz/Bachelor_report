@@ -1,9 +1,9 @@
-\subsection*{Test of CAN, queues}
+\subsection*{Test of CAN and queues}
 In order to test CAN and queues, a task was written. The purpose of the task was to receive a CAN-message if any available from the queue and send the ID and data from the CAN message to a PC using UART.
 The task used can be seen in code \ref{code:test_can_uart_task}.
 
 
-\begin{lstlisting}[language = c, caption = Task used to test CAN, label=code:test_can_uart_task]
+\begin{lstlisting}[language = c, caption = Snippet of task used to test CAN, label=code:test_can_uart_task]
 CAN_frame frame;
 if(QueueReceive(&Queue_CAN_Rx, &frame)) {
 	char ch;

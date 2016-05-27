@@ -1,8 +1,47 @@
-Over all design:
+\textit{This section describes the over all system architecture indoor as well as outdoor. The section goes in details about the components used, how they are connected and describe the information flow through the system. The design choices and implementation details will be covered later in this chapter}
+
+Since this project concerns injecting positions from a RPi outdoor and the extension-board\footnote{\ref{sec:extension_board}} indoor, the system architecture description has been split into two.
+
+\subsection{Indoor}
+Figure \ref{fig:indoor_information_flow} and \ref{fig:outdoor_information_flow} shows the components used, how they are connected and how the information flows indoor and outdoor, respectively.
 \begin{figure}[H]
     \center
     \includegraphics[width=1\textwidth]{graphics/system_architecture_indoor_all.png}
     \caption{Diagram shows information flow when using indoor flying. Server detects the drones position, sends it through the ROS nodes and transmits the GPS positions using WIFI to the drones. Each drone receives its position and sends it using CAN into M4 flight controller}
-    \label{fig:PCB_block}
+    \label{fig:indoor_information_flow}
 \end{figure}
 
+\textbf{Indoor}
+When used indoor, vision\footnote{ Described in section \ref{sec:indoor_localization}} is used to obtain the position of the drones with respect to the camera. 
+
+A Logiteh C930\footnote{The camera is used in other courses to track mobile robots so the author did not have any influence on which camera to use} was mounted below the ceiling to detect the drones when flying.
+
+ROS\footnote{http://www.ros.org/} is used as middle ware on the laptop as inter-process communication. By using ROS it is easier to debug since each node\footnote{Process in ROS terminology} can be isolated and debugged without everything has to be connected. ROS uses subscriber-publisher pattern which means one node can produce data, and one or more nodes can consume. Topics are used to "transport" data between the nodes. ROS has further more a backup-utility called rosbag that records data between one or more nodes. This comes in handy when testing and later on debug what happened. \\
+
+The squares shown in the Laptop section in \ref{fig:indoor_information_flow} shows the ROS nodes and how they are connected using topics. 
+The first node, \textit{cam\_to\_topics} reads directly from the webcam. Each time a frame is capture the image is published to /camera/down where the MarkerLocator\_trackX\footnote{The MarkerLocator is descriped in section \ref{sec:indoor_localization}} is subscribing. The MarkerLocator was customized to support receiving frames from a topic instead of the camera directly. By doing this, multiple instances of the MarkerLocators can be run in parallel without their performance influencing each other.\\
+
+The position detected from each instance of the MarkerLocator is published to \textit{/positions/droneN} whereN is the order of the marker and there by used as identifier of the drone. A \textit{Decision\_Marker}-node is subscribing to the positions topics.
+Since ROS provides this modularity the Decision\_Marker-node can easily be replaced if another behavior of the swarm is required.
+The Decision\_Marker-node shown was designed to control both nodes at once, however if one think of implementing a swam algorithm, it might be more suitable to make a Decision\_Marker for each drone. The outputs of the Decision\_Marker are positions of each drone in latitude/longitude.\\
+The \textit{wifi\_out\_N} nodes will pack the latitude/longitude, append CRC and send the frames to the right drone using wifi\footnote{Described in section \ref{sec:extension_board_wifi}}. \
+
+When a drones receives a frame it is packed into a SLIP packet and sent to the At90CAN128 using UART where the data of the packet is un-SLIP'ed and the data\footnote{Described in section \ref{sec:crc_and_slip}} is verified using CRC. The positioning-data is then packet as CAN-messages \footnote{Described in section \ref{sec:can-messages}} and sent to the M4 flight controller.
+
+
+\subsection{Outdoor}
+\begin{figure}[H]
+    \center
+    \includegraphics[width=0.7\textwidth]{graphics/system_architecture_outdoor_all.png}
+    \caption{Diagram shows information flow when using indoor flying. Server detects the drones position, sends it through the ROS nodes and transmits the GPS positions using WIFI to the drones. Each drone receives its position and sends it using CAN into M4 flight controller}
+    \label{fig:outdoor_information_flow}
+\end{figure}
+
+The Raspberry Pi is also running ROS since it uses two components from Frobomind\footnote{Field robot architecture created and maintained by Kjeld Jensen}. \begin{itemize}
+	\item serial\_nmea\_node is used to read and write from the serial port. Further more it decodes the NMEA string sent by the GPS/RTK-GPS.
+	\item Can\_socket\_node is used to communicate with the CAN-adapter\footnote{PEAK-CAN Adapter has been used in this project}
+\end{itemize}
+
+When a GPGGA/GPRMC\footnote{Decribed in section \ref{sec:alrigty}} is received from the GPS/RTK-GPS its read by the \textit{serial\_nmea\_node} node. It is then forwared to the \textit{AQ\_msg\_conv} nodes which simply converts the content of the GPGGA/GPRMC to CAN-messages received by AQ M4 flight controller.
+
+Even though the positioning is shown using vision and RTK-GPS, other sources of positioning can be used as well. The same code is running on the AQ M4 whether vision or RTK-GPS is used, so if other positioning systems should be used one should implement the CAN protocol shown in appendix\ref{app:aq_can_protocol}. If using CAN is not possible a RPi and CAN-adapter can be used as intermediate, then the \textit{serial\_nmea\_node/AQ\_msg\_conv} should be replaced.
