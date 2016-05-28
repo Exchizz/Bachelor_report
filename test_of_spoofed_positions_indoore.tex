@@ -28,7 +28,7 @@ The code written by the author will then subscribe to \textit{/fmData/nmea\_from
 
 The Rpi is connected directly to the PC using the orange ethernet cable.
 The rosbag was stored and played on the PC, so the ethernet cable were used to share rostopics between the PI and the PC. The roscore where running on the PC.\\
-The Ladybird drone is connected to the RPI using a PEAK CAN-adapter to transfer CAN messages. The Ladybird is powered by the white USB-cable and to show the position of the drone in QgroundStation. The PC is connected to the drone using ST-Link SWD to easier start, stop and restart the drones firmware during the test. To access a TTY on the PI, an FTDI cable has been connected to the PC.
+The Ladybird drone is connected to the RPI using a PEAK CAN-adapter to transfer CAN messages. The Ladybird is powered by the white USB-cable and to show the position of the drone in QgroundStation. The PC is connected to the drone using ST-Link SWD to easier start, stop and restart the drones firmware during the test. To access a \ac{TTY} on the PI, an FTDI cable has been connected to the PC.
 
 
 In order to obtain GPS-testdata to spoof into AQ, a rosbag was used to record data collected by the GPS mounted on the authors laptop. The setup can be seen in figure \ref{fig:test_laptop_and_gps} 

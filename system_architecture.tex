@@ -1,72 +1,132 @@
-\textit{This section describes the overall system architecture indoor as well as outdoor. The section goes in details about the components used, how they are connected and describes the information flow through the system. The design choices and implementation details will be covered later in this chapter}
+\textit{This section describes the overall system architecture indoor as well as outdoor. The section goes in details with the components used and how they are connected. Furthermore it describes the information flow through the system. The design choices and implementation details will be covered later in this chapter.}
 
-Since this project concerns injecting positions from a RTK-GPS outdoor and the extension-board\footnote{\ref{sec:extension_board}} indoor, the system architecture description has been split into two sections.
+The section has been split into two subsections in order to address indoor and outdoor positioning separately.
 
 \subsection{Indoor} \label{sec:system_architecture_indoor}
-Figure \ref{fig:indoor_information_flow} shows the system architecture when used indoor.
+Figure \ref{fig:indoor_information_flow} shows the system architecture for indoor positioning. The laptop detects the drones position using vision, sends it through the ROS nodes and transmits the GPS positions to the drones via WIFI.
+Each drone receives its position and sends it into the M4 flight controller over \ac{CAN}.
 \begin{figure}[H]
     \center
     \includegraphics[width=1\textwidth]{graphics/system_architecture_indoor_all.png}
-    \caption{Diagram showing system architecture when using indoor flying. Laptop detects the drones position, sends it through the ROS nodes and transmits the GPS positions using WIFI to the drones. Each drone receives its position and sends it using CAN into M4 flight controller}
+    \caption{Diagram showing system architecture when using indoor flying.}
     \label{fig:indoor_information_flow}
-\end{figure}
+\end{figure} 
 
-\textbf{Indoor}
-When used indoor, vision\footnote{ Described in section \ref{sec:indoor_localization}} is used to obtain the position of the drones with respect to the camera. 
-
-A Logiteh C930\footnote{The camera is used in other courses to track mobile robots so the author did not have any influence on which camera to use} was mounted below the ceiling to detect the drones when flying.
+A Logiteh C930 camera\footnote{The camera is used in other courses to track mobile robots so the author did not have any influence on which camera to use} was mounted below the ceiling to detect the drones when flying. The order of the marker of each drone is unique in order to identify the particular position of the drone.
 
 
 \subsubsection*{ROS}
-ROS\footnote{http://www.ros.org/} is used as middleware on the laptop as inter-process communication. By using ROS it is easier to debug since each node\footnote{Process in ROS terminology} can be isolated and debugged without everything has to be connected. ROS uses subscriber-publisher pattern which means one or more nodes can produce data, and one or more nodes can consume data. Topic is the term used to define a communication channel between nodes. Nodes producing data are referred to as publishers, and nodes consuming data are referred to as subscribers. ROS has furthermore a backup-utility called rosbag that records data from topics. This comes in handy when testing and later on when debugging what happened. \\
-In case more drones have to be tracked one PC might run out of CPU resources since the MarkerLocator is quite CPU demanding when the entire frame has to be searched. ROS supports running nodes distributed meaning the MarkerLocators can run on another PC than the decision\_marker.
+\ac{ROS}\footnote{http://www.ros.org/} is used as middleware on the laptop as inter-process communication. By using ROS it is easier to debug since each node\footnote{Process in \ac{ROS} terminology} can be isolated and debugged without everything has to be connected. \ac{ROS} uses subscriber-publisher pattern which means one or more nodes can produce data, and one or more nodes can consume data. Topic is the term used to define a communication channel between nodes. Nodes producing data are referred to as publishers, and nodes consuming data are referred to as subscribers.
+Furthermore \ac{ROS} supports running nodes distributed meaning the MarkerLocators can be distributed if more CPU resources are needed when tracking several drones.
+The squares shown in the \ac{ROS} section in figure \ref{fig:indoor_information_flow} shows the \ac{ROS} nodes and how they are connected using topics.
 
-The squares shown in the Laptop section in figure \ref{fig:indoor_information_flow} shows the ROS nodes and how they are connected using topics. 
-Each time a frame is capture the node \textit{cam\_to\_topics} publishes the frame to /camera/down where the MarkerLocator\_trackN\footnote{The MarkerLocator is described in section \ref{sec:indoor_localization}} is subscribing. The MarkerLocator was customized to support receiving frames from a topic instead of the camera directly. By doing this, multiple instances of the MarkerLocator can be run in parallel without their performance impact each other. \footnote{Described in section \ref{sec:indoor_localization}}
 
-The position detected from each instance of the MarkerLocator is published to \textit{/positions/droneN} where N is the order of the marker and thereby used as identifier of the drone. 
-The \textit{Decision\_Marker}-node subscribes to the positions topics and decides where the position of the drone is told to be.\footnote{Manipulation of the drones position is described in section \ref{sec:control_and_coordinate_conversion}}
-Since ROS provides this modularity the \textit{Decision\_Marker}-node can easily be replaced if another behavior of the swarm is required.
-The \textit{Decision\_Marker}-node shown was designed to control two drones at once\footnote{As initial testing}, however when implementing a swam algorithm, it might be more suitable to make a \textit{Decision\_Marker} for each drone. The output of the \textit{Decision\_Marker} is positions of each drone in latitude/longitude.\\
-The \textit{wifi\_out\_N} nodes will pack the latitude/longitude to a dataframe \footnote{Described in section \ref{sec:wireless_communication_flow}}, append CRC and send the frames to the right drone using wifi\footnote{Described in section \ref{sec:}}. \
-
-When a drones receives a frame it is packed into a SLIP packet and sent to the At90CAN128 using UART where the data of the packet is un-SLIP'ed and the data\footnote{Described in section \ref{sec:crc_and_slip}} is verified using CRC. The positioning-data is then packet as CAN-messages \footnote{Described in section \ref{sec:can-messages}} and sent to the M4 flight controller.
-
-\subsubsection*{Information flow}
-Through out the system, the frame changes format and content.
-
-The message sent from \textit{cam\_to\_topic} to the MarkerLocators is just an stream of RGB images. The messages sent out of the MarkerLocators consist of a 
-
-When the \textit{wifi\_out\_n}-node receives a position from a topic, it packs the data into the format shown in table \ref{tab:wifi_frame}
+\begin{itemize}
+	\item \textit{cam\_to\_topic} captures frames from the Logitech camera and publish the raw frame to \textit{/camera/down} as a RGB picture.
+	\item \textit{MarkerLocator\_trackN} subscribes to \textit{cam\_to\_topic} and processes the frame in order to localize the marker of the drone in the frame. This node publishes messages to \textit{/positions/droneN} containing x,y position, orientation and a boolean telling whether the right marker is found in the frame or not. The MarkerLocator was customized to support receiving frames from a topic instead of the camera directly. By doing this, multiple instances of the MarkerLocator can be run in parallel without their performance impact each other. \footnote{Described in section \ref{sec:indoor_localization}}
+	\item \textit{Decision\_Maker} subscribes to the topics containing the position of the drones. This node publishes messages to \textit{/communication/to\_droneN} containing the \ac{LLH} position of the drone. This node contains the logic for controlling the drones \footnote{Described in section \ref{sec:control_and_coordinate_conversion}}. Due to the modularity of ROS, changing the behavior of the drones is a matter of replacing this node.
+	\item \textit{wifi\_outN} subscribes to \textit{/communication/to\_droneN} and transmits the received messages to the drone using WIFI. The responsibility of this node is to pack the message, calculate \ac{CRC}, append it and send it as an \ac{UDP} packet. The content of the frame can be seen in table \ref{tab:wifi_frame}.
+\end{itemize}
 
 \begin{table}[H]
 \centering
-\begin{tabular}{@{}|l|l|l|l|l|l|l|l|l|l|l|l|l|@{}}
+\begin{tabular}{@{}|l|l|l|l|l|l|l|l|l|l|@{}}
 \toprule
-\textit{Content}  & \multicolumn{4}{l|}{Future}    & eDOP & nDOP & tDOP & vDOP & Height & Lon    & Lat    & CRC-16    \\ \midrule
-\textit{Datatype} & \multicolumn{4}{l|}{4 * bytes} & byte & byte & byte & byte & double & double & double & uint16\_t \\ \midrule
-\textit{Bytes}    & \multicolumn{4}{l|}{34:31}     & 30   & 29   & 28   & 27   & 26:18  & 17:10  & 9:2    & 1:0       \\ \bottomrule
+\textit{Content}  & CRC-16    & Future  & eDOP  & nDOP & tDOP & vDOP &      Height   & Lon     & Lat       \\ \midrule
+\textit{Datatype} & uint16\_t & 4 byte  & byte  & byte & byte & byte &      double   & double  & double  \\ \midrule
+\textit{Bytes}    & 33:32     &  31:28  & 27    & 26   & 25   & 24   &      23:16    & 15:8    & 7:0       \\ \bottomrule
 \end{tabular}
-\caption{Table shows the frame sent from the \textit{wifi\_out\_N} to the extension-boards. 4 bytes is not utilized but can be used for anything or the frame can be reduced}
+\caption{Table shows the frame sent from the \textit{wifi\_out\_N} to the extension-boards. 4 bytes is not utilized but can be used for anything or the frame can be reduced in size}
 \label{tab:wifi_frame}
 \end{table}
-The frame in table \ref{tab:wifi_frame} is 34 bytes long but can be enlarged or made smaller if needed. The ESP8266 module has a limitation if 8192 bytes \footnote{https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/src/WiFiUdp.h\#L28}
+
+The frame in table \ref{tab:wifi_frame} is 34 bytes long but can be enlarged or made smaller if needed. The ESP8266 module has a limitation if 8192 bytes \footnote{\url{https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/src/WiFiUdp.h\#L28} visited 28 Maj}
 
 The initial idea was to also send the velocities of the drone and the accuracies to each extension-board since this information is used by AQ M4, however due to lack of time this was not implemented.
+
+
+\subsubsection*{Drone}
+The drone is a Ladybird using a \ac{AQ} M4 as flight controller with a modified version of the firmware.\footnote{AQ M4 firmware is described in section \ref{sec:aq_m4_firmware}} Is has an extension-board that enables it to receive positions from WIFI and inject them into the \ac{AQ} M4 over \ac{CAN}. \footnote{The extension-board is described in section \ref{sec:sec:autoquad_extension_board}}
+\begin{itemize}
+	\item \textit{ESP8266} receives the UDP packet sent from the computer running \ac{ROS}. When a frame is received, it checks if the received number of bytes it correct. If so, it encapsulates the packet using \ac{SLIP} and transmit it to the At90CAN128.\footnote{The firmware running on the ESP8266 module is described in section \ref{sec:unknown}}
+	\item \textit{At90CAN128} receives the encapsulated packet, decapsulate it, verify the CRC and transmit the packet to the \ac{AQ} M4 over \ac{CAN}.
+\end{itemize}
+
+
+Tables \cref{tab:CAN_DOC_LAT,tab:CAN_DOC_LON,tab:CAN_DOC_VEL,tab:CAN_DOC_ALT,tab:CAN_DOC_DOP,tab:CAN_DOC_ACC} show the CAN-messages send to \ac{AQ}.
+\begin{multicols}{2}
+\begin{table}[H]
+	\begin{tabular}{@{}|l|l|@{}}
+		\toprule
+		DOC   & CAN\_DOC\_LAT \\ \midrule
+		Value & Latitude      \\ \midrule
+		Bits  & 63:0          \\ \bottomrule
+	\end{tabular}
+	\caption{CAN message to \ac{AQ} containing 8 byte latitude}	\label{tab:CAN_DOC_LAT}
+
+	\begin{tabular}{@{}|l|l|@{}}
+	\toprule
+		DOC   & CAN\_DOC\_LON \\ \midrule
+		Value & Longitude     \\ \midrule
+		Bits  & 63:0          \\ \bottomrule
+	\end{tabular}
+	\caption{CAN message to \ac{AQ} containing 8 byte longitude} 	\label{tab:CAN_DOC_LON}
+
+\end{table}
+\columnbreak
+\begin{table}[H]
+	\begin{tabular}{@{}|l|l|l|l|l|@{}}
+		\toprule
+		DOC   & \multicolumn{4}{l|}{CAN\_DOC\_VEL} \\ \midrule
+		Value & VelN    & VelE   & VelD   & speed  \\ \midrule
+		Bits  & 63:48   & 47:32  & 31:16  & 15:0   \\ \bottomrule
+	\end{tabular}
+	\caption{CAN message to \ac{AQ} containing velocities each of 2 bytes}
+	\label{tab:CAN_DOC_VEL}
+	\begin{tabular}{@{}|l|l|@{}}
+	\toprule
+		DOC   & CAN\_DOC\_ALT \\ \midrule
+		Value & Altitude      \\ \midrule
+		Bits  & 63:0          \\ \bottomrule
+	\end{tabular}
+	\caption{CAN message to \ac{AQ} containing 8 byte altitude}
+	\label{tab:CAN_DOC_ALT}
+\end{table}
+\end{multicols}
+
+\begin{table}[H]
+	\begin{tabular}{@{}|l|l|l|l|l|l|l|l|@{}}
+		\toprule
+		DOC   & \multicolumn{7}{l|}{CAN\_DOC\_DOP}                  \\ \midrule
+		Value & gDOP  & eDOP  & nDOP  & tDOP  & vDOP  & hDOP & pDOP \\ \midrule
+		Bits  & 55:48 & 47:40 & 39:32 & 31:24 & 23:16 & 15:8 & 7:0  \\ \bottomrule
+	\end{tabular}
+	\caption{CAN messages to \ac{AQ} containing \ac{DOP}s each of 1 byte}
+	\label{tab:CAN_DOC_DOP}
+	\begin{tabular}{@{}|l|l|l|l|l|l|l|l|@{}}
+		\toprule
+		DOC   & \multicolumn{7}{l|}{CAN\_DOC\_ACC}                          \\ \midrule
+		Value & Heading & vAcc  & hAcc  & cAcc  & sAcc  & Fix  & Satellites \\ \midrule
+		Bits  & 63:48   & 47:40 & 39:32 & 31:24 & 23:16 & 15:8 & 7:0        \\ \bottomrule
+	\end{tabular}\label{tab:CAN_DOC_ACC}
+	\caption{CAN messages to \ac{AQ} containing accuracies of 1 byte and heading in 2 bytes} 
+\end{table}
+
 
 \subsection{Outdoor}
 \begin{figure}[H]
     \center
-    \includegraphics[width=0.7\textwidth]{graphics/system_architecture_outdoor_all.png}
-    \caption{Diagram shows information flow when using indoor flying. Server detects the drones position, sends it through the ROS nodes and transmits the GPS positions using WIFI to the drones. Each drone receives its position and sends it using CAN into M4 flight controller}
+    \includegraphics[width=0.7\textwidth]{graphics/system_architecture_outdoor.png}
+    \caption{Diagram shows information flow when using outdoor flying. The RTK-GNSS provides a absolute position  which is read and converted to CAN messages by the Raspberry PI}
     \label{fig:outdoor_information_flow}
 \end{figure}
 
-The Raspberry Pi is also running ROS since it uses two components from Frobomind\footnote{Field robot architecture created and maintained by Kjeld Jensen}. \begin{itemize}
-	\item serial\_nmea\_node is used to read and write from the serial port. Further more it decodes the NMEA string sent by the GPS/RTK-GPS.
-	\item Can\_socket\_node is used to communicate with the CAN-adapter\footnote{PEAK-CAN Adapter has been used in this project}
+The \ac{RPi} is also running ROS since it uses two components from Frobomind\footnote{Field robot architecture created and maintained by Kjeld Jensen \url {http://frobomind.org/} last visited 28 Maj}. \begin{itemize}
+	\item \textit{serial\_nmea\_node} is used to read and write from the serial port. Further more it decodes the NMEA string sent by the RTK-GNSS
+	\item \textit{can\_socket\_node} is used to communicate with the CAN-adapter\footnote{PEAK-CAN Adapter has been used in this project}
 \end{itemize}
 
-When a GPGGA/GPRMC\footnote{Decribed in section \ref{sec:alrigty}} is received from the GPS/RTK-GPS its read by the \textit{serial\_nmea\_node} node. It is then forwared to the \textit{AQ\_msg\_conv} nodes which simply converts the content of the GPGGA/GPRMC to CAN-messages received by AQ M4 flight controller.
+When a GPGGA/GPRMC\footnote{Decribed in section \ref{sec:alrigty}} is received from the RTK-GNSS its read by the \textit{serial\_nmea\_node} node. It is then forwared to the \textit{AQ\_msg\_conv} nodes which simply converts the content of the GPGGA/GPRMC to CAN-messages received by \ac{AQ} M4 flight controller.
 
-Even though the positioning is shown using vision and RTK-GPS, other sources of positioning can be used as well. The same code is running on the AQ M4 whether vision or RTK-GPS is used, so if other positioning systems should be used one should implement the CAN protocol shown in appendix\ref{app:aq_can_protocol}. If using CAN is not possible a RPi and CAN-adapter can be used as intermediate, then the \textit{serial\_nmea\_node/AQ\_msg\_conv} should be replaced.
+Even though the positioning is shown using vision and RTK-GNSS, other sources of positioning can be used as well. The same code is running on the AQ M4 whether vision or RTK-GPS is used, so if other positioning systems should be used one should implement the CAN protocol shown in appendix\ref{app:aq_can_protocol}.
+If using CAN is not possible a RPi and CAN-adapter can be used as intermediate, then the \textit{serial\_nmea\_node/AQ\_msg\_conv} should be replaced.
