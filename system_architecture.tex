@@ -1,13 +1,13 @@
-\textit{This section describes the over all system architecture indoor as well as outdoor. The section goes in details about the components used, how they are connected and describe the information flow through the system. The design choices and implementation details will be covered later in this chapter}
+\textit{This section describes the overall system architecture indoor as well as outdoor. The section goes in details about the components used, how they are connected and describes the information flow through the system. The design choices and implementation details will be covered later in this chapter}
 
-Since this project concerns injecting positions from a RPi outdoor and the extension-board\footnote{\ref{sec:extension_board}} indoor, the system architecture description has been split into two.
+Since this project concerns injecting positions from a RTK-GPS outdoor and the extension-board\footnote{\ref{sec:extension_board}} indoor, the system architecture description has been split into two sections.
 
-\subsection{Indoor}
-Figure \ref{fig:indoor_information_flow} and \ref{fig:outdoor_information_flow} shows the components used, how they are connected and how the information flows indoor and outdoor, respectively.
+\subsection{Indoor} \label{sec:system_architecture_indoor}
+Figure \ref{fig:indoor_information_flow} shows the system architecture when used indoor.
 \begin{figure}[H]
     \center
     \includegraphics[width=1\textwidth]{graphics/system_architecture_indoor_all.png}
-    \caption{Diagram shows information flow when using indoor flying. Server detects the drones position, sends it through the ROS nodes and transmits the GPS positions using WIFI to the drones. Each drone receives its position and sends it using CAN into M4 flight controller}
+    \caption{Diagram showing system architecture when using indoor flying. Laptop detects the drones position, sends it through the ROS nodes and transmits the GPS positions using WIFI to the drones. Each drone receives its position and sends it using CAN into M4 flight controller}
     \label{fig:indoor_information_flow}
 \end{figure}
 
@@ -16,18 +16,43 @@ When used indoor, vision\footnote{ Described in section \ref{sec:indoor_localiza
 
 A Logiteh C930\footnote{The camera is used in other courses to track mobile robots so the author did not have any influence on which camera to use} was mounted below the ceiling to detect the drones when flying.
 
-ROS\footnote{http://www.ros.org/} is used as middle ware on the laptop as inter-process communication. By using ROS it is easier to debug since each node\footnote{Process in ROS terminology} can be isolated and debugged without everything has to be connected. ROS uses subscriber-publisher pattern which means one node can produce data, and one or more nodes can consume. Topics are used to "transport" data between the nodes. ROS has further more a backup-utility called rosbag that records data between one or more nodes. This comes in handy when testing and later on debug what happened. \\
 
-The squares shown in the Laptop section in \ref{fig:indoor_information_flow} shows the ROS nodes and how they are connected using topics. 
-The first node, \textit{cam\_to\_topics} reads directly from the webcam. Each time a frame is capture the image is published to /camera/down where the MarkerLocator\_trackX\footnote{The MarkerLocator is descriped in section \ref{sec:indoor_localization}} is subscribing. The MarkerLocator was customized to support receiving frames from a topic instead of the camera directly. By doing this, multiple instances of the MarkerLocators can be run in parallel without their performance influencing each other.\\
+\subsubsection*{ROS}
+ROS\footnote{http://www.ros.org/} is used as middleware on the laptop as inter-process communication. By using ROS it is easier to debug since each node\footnote{Process in ROS terminology} can be isolated and debugged without everything has to be connected. ROS uses subscriber-publisher pattern which means one or more nodes can produce data, and one or more nodes can consume data. Topic is the term used to define a communication channel between nodes. Nodes producing data are referred to as publishers, and nodes consuming data are referred to as subscribers. ROS has furthermore a backup-utility called rosbag that records data from topics. This comes in handy when testing and later on when debugging what happened. \\
+In case more drones have to be tracked one PC might run out of CPU resources since the MarkerLocator is quite CPU demanding when the entire frame has to be searched. ROS supports running nodes distributed meaning the MarkerLocators can run on another PC than the decision\_marker.
 
-The position detected from each instance of the MarkerLocator is published to \textit{/positions/droneN} whereN is the order of the marker and there by used as identifier of the drone. A \textit{Decision\_Marker}-node is subscribing to the positions topics.
-Since ROS provides this modularity the Decision\_Marker-node can easily be replaced if another behavior of the swarm is required.
-The Decision\_Marker-node shown was designed to control both nodes at once, however if one think of implementing a swam algorithm, it might be more suitable to make a Decision\_Marker for each drone. The outputs of the Decision\_Marker are positions of each drone in latitude/longitude.\\
-The \textit{wifi\_out\_N} nodes will pack the latitude/longitude, append CRC and send the frames to the right drone using wifi\footnote{Described in section \ref{sec:extension_board_wifi}}. \
+The squares shown in the Laptop section in figure \ref{fig:indoor_information_flow} shows the ROS nodes and how they are connected using topics. 
+Each time a frame is capture the node \textit{cam\_to\_topics} publishes the frame to /camera/down where the MarkerLocator\_trackN\footnote{The MarkerLocator is described in section \ref{sec:indoor_localization}} is subscribing. The MarkerLocator was customized to support receiving frames from a topic instead of the camera directly. By doing this, multiple instances of the MarkerLocator can be run in parallel without their performance impact each other. \footnote{Described in section \ref{sec:indoor_localization}}
+
+The position detected from each instance of the MarkerLocator is published to \textit{/positions/droneN} where N is the order of the marker and thereby used as identifier of the drone. 
+The \textit{Decision\_Marker}-node subscribes to the positions topics and decides where the position of the drone is told to be.\footnote{Manipulation of the drones position is described in section \ref{sec:control_and_coordinate_conversion}}
+Since ROS provides this modularity the \textit{Decision\_Marker}-node can easily be replaced if another behavior of the swarm is required.
+The \textit{Decision\_Marker}-node shown was designed to control two drones at once\footnote{As initial testing}, however when implementing a swam algorithm, it might be more suitable to make a \textit{Decision\_Marker} for each drone. The output of the \textit{Decision\_Marker} is positions of each drone in latitude/longitude.\\
+The \textit{wifi\_out\_N} nodes will pack the latitude/longitude to a dataframe \footnote{Described in section \ref{sec:wireless_communication_flow}}, append CRC and send the frames to the right drone using wifi\footnote{Described in section \ref{sec:}}. \
 
 When a drones receives a frame it is packed into a SLIP packet and sent to the At90CAN128 using UART where the data of the packet is un-SLIP'ed and the data\footnote{Described in section \ref{sec:crc_and_slip}} is verified using CRC. The positioning-data is then packet as CAN-messages \footnote{Described in section \ref{sec:can-messages}} and sent to the M4 flight controller.
 
+\subsubsection*{Information flow}
+Through out the system, the frame changes format and content.
+
+The message sent from \textit{cam\_to\_topic} to the MarkerLocators is just an stream of RGB images. The messages sent out of the MarkerLocators consist of a 
+
+When the \textit{wifi\_out\_n}-node receives a position from a topic, it packs the data into the format shown in table \ref{tab:wifi_frame}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}|l|l|l|l|l|l|l|l|l|l|l|l|l|@{}}
+\toprule
+\textit{Content}  & \multicolumn{4}{l|}{Future}    & eDOP & nDOP & tDOP & vDOP & Height & Lon    & Lat    & CRC-16    \\ \midrule
+\textit{Datatype} & \multicolumn{4}{l|}{4 * bytes} & byte & byte & byte & byte & double & double & double & uint16\_t \\ \midrule
+\textit{Bytes}    & \multicolumn{4}{l|}{34:31}     & 30   & 29   & 28   & 27   & 26:18  & 17:10  & 9:2    & 1:0       \\ \bottomrule
+\end{tabular}
+\caption{Table shows the frame sent from the \textit{wifi\_out\_N} to the extension-boards. 4 bytes is not utilized but can be used for anything or the frame can be reduced}
+\label{tab:wifi_frame}
+\end{table}
+The frame in table \ref{tab:wifi_frame} is 34 bytes long but can be enlarged or made smaller if needed. The ESP8266 module has a limitation if 8192 bytes \footnote{https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/src/WiFiUdp.h\#L28}
+
+The initial idea was to also send the velocities of the drone and the accuracies to each extension-board since this information is used by AQ M4, however due to lack of time this was not implemented.
 
 \subsection{Outdoor}
 \begin{figure}[H]

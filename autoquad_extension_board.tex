@@ -1,6 +1,6 @@
 \textit{This secion will go in depth with the extension-board created as an addon to the AQ M4 board. The extension-board was developed to act as a bridge between the PC and the CAN-bus using wireless communication.} \\
 
-\subsubsection*{Wireless communication module}
+\subsubsection*{Wireless communication module} \label{sec:wireless_communication_module}
 An important part of the hardware is the wireless communication used between the PC and the drones.
 The wireless communication module has severel requirements it needs to fulfill in order to make the whole system work as expected. A comparison table has been made in table \ref{tab:compare_table_wireless_communication} to find the wireless communication module that is best suited for the task. \\
 The following wireless modules where considered and compared.
@@ -94,31 +94,29 @@ Which type of sensor suits best as a distance sensor to provice altitude informa
 
 \subsubsection*{Debug/ISP}
 In the final schematic UART0 and ISP pins where combined in one pinheader for easy access through one cable. \Mathias{Refer to image of board}
+The connector can be seen in figure \ref{fig:extension_board}.
+
 To program the AtMega the ISP pins where required to be easy accessable. 
 UART0 was made accessable to be used as debug and programming of the ESP8266 board.
 The idea was to setup the AtMega as UART passthrough from UART0 to UART1.
 Due to a mistake\footnote{The wrong pair of MISO/MOSI pins where made available in the ISP-header. The correct pair of MISO/MOSI is also RXD0/TXD0 as alternative function} in the final schematic, both UART0 and UART1 where made accessable trough the ISP/debug header. 
 This ended up making it easier to program the ESP8266-board without using the AtMega as UART passthrough.
 
-
-
 \begin{figure}[H]
     \centering
     \begin{subfigure}[b]{0.45\textwidth}
         \includegraphics[width=\textwidth]{graphics/extension_board_up}
         \caption{Top-view of the developed extension-board. If looking carefully, the ISP-fix can be seen between the ESP-8266 module and the Debug/ISP pins.}
-        \label{fig:tiger}
+        \label{fig:extension_board_up}
     \end{subfigure}
-    ~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc. 
-    %(or a blank line to force the subfigure onto a new line)
+    ~ 
     \begin{subfigure}[b]{0.51\textwidth}
         \includegraphics[width=\textwidth]{graphics/extension_board_down}
         \caption{Bottom-view of the developed-extension board. The two connects for the AQ M4 board can be seen pointing up. The CAN-connect is of same type mounted on the AQ M4 board.}
-        \label{fig:mouse}
+        \label{fig:extension_board_down}
     \end{subfigure}
     \caption{Top and bottom view of the extension-board}\label{fig:extension_board}
 \end{figure}
-
 
 
 \subsubsection*{Test of WIFI range}
@@ -142,19 +140,20 @@ Another test was done where the authors laptops sends datapackages to the ESP826
 \begin{figure}[H]
     \center
     \includegraphics[width=0.85\textwidth]{graphics/crc_distance_check.eps}
-	\caption{Two modules were connected to one laptop which transmitted datapackets to both modules. Another laptop was connected to one extension-board at a time to check it received all of its packets without error}
+	\caption{Two modules were connected to one laptop which transmitted datapackets to both modules. Another laptop was connected to one extension-board at a time to check it received all of its packets without error. At the beginning a measurement was done at every meter, however to save time the distance was increase to 5 meter and later to 10. When packets began to drop, measurements was done at 5 meter interval}
     \label{fig:wifi_pingtest}
 \end{figure}
 
 
 A final test was made to see how the modules behave when two modules are receiving the packets. At 10 hz datapackets was sent to two modules at a distance of 10 meters.
+Unfortunately only one wire to communicate with the extension-board were made which made it impossible to check if both extension-boards received the data without error. The test was done 4 times while switching between the modules to verify both modules were receiving all the packets.\footnote{If more time were available, a timing-test of the setup would have been done. By measuring the time it takes one drones to receive 200 packets, do the same test but when two drones each receiving 200 packets.}
 \begin{figure}[H]
     \centering
         \includegraphics[width=0.5\textwidth]{graphics/laptop_extenbioard_crc_check}
         \caption{}
         \label{fig:tiger}
 \end{figure}
-Both modules received their packets without CRC error.
+Both modules received 200 packets without CRC error 
 
 It can be concluded that the chosen wifi modules, ESP8266 works well. At a distance of 100 meters it drops.... and that .. and it indicates that the communication works when more than one ESP8266 is connected to the laptop using WIFI.
 

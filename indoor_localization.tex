@@ -4,7 +4,7 @@
 In order to do accurate flying indoor a localization system is needed. In the Related Work section, it can be seen vision with a camera mounted pointing down is used by others. Compared to use one or more cameras mounted on the drone, an advantage of using a camera mounted on the ceiling is that the camera will not be harmed if the drone crashes and that one camera can be used to detect several drones. However if the position is needed in more than 2D, more than one camera might be needed(depending on the algorithm used) but it still scales better than mounting one or more cameras on each drone. \\
 
 Based on previous experience, the MarkerLocator written by Henrik Midtiby was chosen as indoor localization. Its using OpenCV\footnote{\url{http://opencv.org/}} and implemented in python. It works by detecting markers as shown in figure \ref{fig:markerlocator_marker}
-\Mathias{insert image of markerLocator marker with different orders}
+
 
 
 \begin{figure}[H]
@@ -84,12 +84,12 @@ Figure \ref{fig:markerlocator_algorithm_order_match} shows a simple algorithm th
 If the MarkerLocator is looking for a marker of order 4 and it has detected a marker and its orientation, the algorithm calculates where the location of the arms. It then checks a pixel in each arm and increments a counter if the pixel is black. When it has checked all the arms it compares the counter with the order the MarkerLocator is looking for and returns if they match or not. 
 This method does not provide a scalar as output but a binary and thereby has no threshold. However in order to detect if a pixel is black or not, a threshold has been used. The threshold was set to 100 which has shown good results doing tests and flight. \\
 
-During development of quality measures it was noted that if the MarkerLocator does a full search because it cannot find a marker with order 4, it slows down the detection of the marker of order 6. This is because the MarkerLocator is implemented in one process without threading. However this has been solved by splitting up the MarkerLocator in different processes so they run independently of each other. More about this in section  \ref{sec:indoor_localization} \\
+During development of quality measures it was noted that if the MarkerLocator does a full search because it cannot find a marker with order 4, it slows down the detection of the marker of order 6. This is because the MarkerLocator is implemented in one process without threading. However this has been solved by splitting up the MarkerLocator in different processes so they run independently of each other. More about this in section  \ref{sec:system_architecture_indoor} \\
 
 \textbf{Perspective correction} \\
 In order to use centimeters as measure of the position of the markers and to correct if the camera is not pointing directly down, the build-in perspective correction in the MarkerLocator were used.
 It works by using homography\cite{janeriksolem2012} to make the transformation from pixels to some chosen unit which in this case is centimeters.
-\begin{wrapfigure}{r}{0.5\textwidth}
+\begin{wrapfigure}{r}{0.4\textwidth}
   \vspace{-20pt}
   \begin{center}
     \includegraphics[width=0.48\textwidth]{graphics/whiteboard_tilted.jpg}

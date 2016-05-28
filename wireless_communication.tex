@@ -1,3 +1,9 @@
-\subsubsection*{Communication flow}
-\input{communication_flow}
+\subsubsection{Network configuration} 
+\textit{This section describes how the networking was configured and shows the frame sent from the PC to the extension-boards}
 
+Since a wireless module using WIFI was chosen \footnote{See section \ref{sec:wireless_communication_module}} some networking has to be configured.
+The PC\footnote{The PC used in this project was the authors laptop} was running an access point for each extension-board to join. The access point was setup using a Asus USB-N13\footnote{Not available on AUSUS' webpage.} netcard and hostapd\footnote{https://w1.fi/hostapd/} as software.  The network was configured as WPA2 to make it difficult for other to connect and start messing with the network.
+
+Instead of statically assigning each extension-board an IP in the code which would be cumbersome each time a change in firmware should be deployed, a DHCP server was configured on the PC. Since the IP might change next time the module connects, mDNS was configured on the ESP8266 and the laptop. Each extension-board was giving a hostname eg. Drone1 so when the PC has to send a frame to Drone1, the underlaying networking will resolve the IP of Drone1. 
+The ESP8266 has a small filesystem build-in which support creating a configuration file that could contain the hostname.
+When flashing the ESP8266 module the configuration file would not be overwritten and thereby still have the hostname of the module.\footnote{Due to lack of time the configuration file was not made, and the hostname was hardcoded in the ESP8266 firmware.}
