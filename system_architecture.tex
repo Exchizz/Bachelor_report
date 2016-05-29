@@ -8,7 +8,7 @@ Each drone receives its position and sends it into the M4 flight controller over
 \begin{figure}[H]
     \center
     \includegraphics[width=1\textwidth]{graphics/system_architecture_indoor_all.png}
-    \caption{Diagram showing system architecture when using indoor flying.}
+    \caption{Diagram showing system architecture when using indoor. The markers used to track the drones is shown below the camera.}
     \label{fig:indoor_information_flow}
 \end{figure} 
 
@@ -17,14 +17,14 @@ A Logiteh C930 camera\footnote{The camera is used in other courses to track mobi
 
 \subsubsection*{ROS}
 \ac{ROS}\footnote{http://www.ros.org/} is used as middleware on the laptop as inter-process communication. By using ROS it is easier to debug since each node\footnote{Process in \ac{ROS} terminology} can be isolated and debugged without everything has to be connected. \ac{ROS} uses subscriber-publisher pattern which means one or more nodes can produce data, and one or more nodes can consume data. Topic is the term used to define a communication channel between nodes. Nodes producing data are referred to as publishers, and nodes consuming data are referred to as subscribers.
-Furthermore \ac{ROS} supports running nodes distributed meaning the MarkerLocators can be distributed if more CPU resources are needed when tracking several drones.
+Furthermore \ac{ROS} supports running nodes distributed across multiple PCs meaning the MarkerLocators can be distributed if more CPU resources are needed when tracking several drones.
 The squares shown in the \ac{ROS} section in figure \ref{fig:indoor_information_flow} shows the \ac{ROS} nodes and how they are connected using topics.
 
 
 \begin{itemize}
 	\item \textit{cam\_to\_topic} captures frames from the Logitech camera and publish the raw frame to \textit{/camera/down} as a RGB picture.
-	\item \textit{MarkerLocator\_trackN} subscribes to \textit{cam\_to\_topic} and processes the frame in order to localize the marker of the drone in the frame. This node publishes messages to \textit{/positions/droneN} containing x,y position, orientation and a boolean telling whether the right marker is found in the frame or not. The MarkerLocator was customized to support receiving frames from a topic instead of the camera directly. By doing this, multiple instances of the MarkerLocator can be run in parallel without their performance impact each other. \footnote{Described in section \ref{sec:indoor_localization}}
-	\item \textit{Decision\_Maker} subscribes to the topics containing the position of the drones. This node publishes messages to \textit{/communication/to\_droneN} containing the \ac{LLH} position of the drone. This node contains the logic for controlling the drones \footnote{Described in section \ref{sec:control_and_coordinate_conversion}}. Due to the modularity of ROS, changing the behavior of the drones is a matter of replacing this node.
+	\item \textit{MarkerLocator\_trackN} subscribes to \textit{cam\_to\_topic} and processes the frame in order to localize the marker or order N of the drone in the frame. This node publishes messages to \textit{/positions/droneN} containing x,y position, orientation and a boolean telling whether the right marker is found in the frame or not. The MarkerLocator was customized to support receiving frames from a topic instead of the camera directly. By doing this, multiple instances of the MarkerLocator can be run in parallel without their performance impact each other. \footnote{Indoor localization is described in section \ref{sec:indoor_localization}}
+	\item \textit{Decision\_Maker} subscribes to the topics containing the position of the drones. This node publishes messages to \textit{/communication/to\_droneN} containing the \ac{LLH} position of the drone. This node contains the logic for controlling the drones \footnote{Decision\_maker is described in section \ref{sec:control_and_coordinate_conversion}}. Due to the modularity of ROS, changing the behavior of the drones is a matter of replacing this node.
 	\item \textit{wifi\_outN} subscribes to \textit{/communication/to\_droneN} and transmits the received messages to the drone using WIFI. The responsibility of this node is to pack the message, calculate \ac{CRC}, append it and send it as an \ac{UDP} packet. The content of the frame can be seen in table \ref{tab:wifi_frame}.
 \end{itemize}
 
@@ -40,14 +40,14 @@ The squares shown in the \ac{ROS} section in figure \ref{fig:indoor_information_
 \label{tab:wifi_frame}
 \end{table}
 
-The frame in table \ref{tab:wifi_frame} is 34 bytes long but can be enlarged or made smaller if needed. The ESP8266 module has a limitation if 8192 bytes \footnote{\url{https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/src/WiFiUdp.h\#L28} visited 28 Maj}
+The frame in table \ref{tab:wifi_frame} is 34 bytes long but can be enlarged or made smaller if needed. However the ESP8266 module has a limitation of 8192 bytes \footnote{\url{https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/src/WiFiUdp.h\#L28} last visited 28 Maj}
 
 The initial idea was to also send the velocities of the drone and the accuracies to each extension-board since this information is used by AQ M4, however due to lack of time this was not implemented.
 
 \subsubsection*{Drone}
-The drone is a Ladybird using a \ac{AQ} M4 as flight controller with a modified version of the firmware.\footnote{AQ M4 firmware is described in section \ref{sec:aq_m4_firmware}} Is has an extension-board that enables it to receive positions from WIFI and inject them into the \ac{AQ} M4 over \ac{CAN}. \footnote{The extension-board is described in section \ref{sec:sec:autoquad_extension_board}}
+The drone is a Ladybird using a \ac{AQ} M4 as flight controller with a modified version of the firmware.\footnote{AQ M4 firmware is described in section \ref{sec:aq_m4_firmware}} Is has an extension-board that enables it to receive positions from WIFI and inject them into the \ac{AQ} M4 over \ac{CAN}. \footnote{The extension-board is described in section \ref{sec:autoquad_extension_board}}
 \begin{itemize}
-	\item \textit{ESP8266} receives the UDP packet sent from the computer running \ac{ROS}. When a frame is received, it checks if the received number of bytes it correct. If so, it encapsulates the packet using \ac{SLIP} and transmit it to the At90CAN128.\footnote{The firmware running on the ESP8266 module is described in section \ref{sec:unknown}}
+	\item \textit{ESP8266}\footnote{The firmware running on the ESP8266 module is described in section \ref{sec:exp8266_firmware}} receives the UDP packet sent from the computer running \ac{ROS}. When a frame is received, it checks if the received number of bytes it correct. If so, it encapsulates the packet using \ac{SLIP} and transmit it to the At90CAN128.
 	\item \textit{At90CAN128} receives the encapsulated packet, decapsulate it, verify the CRC and transmit the packet to the \ac{AQ} M4 over \ac{CAN}.
 \end{itemize}
 
