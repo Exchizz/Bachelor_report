@@ -44,7 +44,7 @@ The frame in table \ref{tab:wifi_frame} is 34 bytes long but can be enlarged or 
 
 The initial idea was to also send the velocities of the drone and the accuracies to each extension-board since this information is used by AQ M4, however due to lack of time this was not implemented.
 
-\subsubsection*{Drone}
+\subsubsection*{Drone} \label{sec:system_indoor_drone}
 The drone is a Ladybird using a \ac{AQ} M4 as flight controller with a modified version of the firmware.\footnote{AQ M4 firmware is described in section \ref{sec:aq_m4_firmware}} Is has an extension-board that enables it to receive positions from WIFI and inject them into the \ac{AQ} M4 over \ac{CAN}. \footnote{The extension-board is described in section \ref{sec:autoquad_extension_board}}
 \begin{itemize}
 	\item \textit{ESP8266}\footnote{The firmware running on the ESP8266 module is described in section \ref{sec:exp8266_firmware}} receives the UDP packet sent from the computer running \ac{ROS}. When a frame is received, it checks if the received number of bytes it correct. If so, it encapsulates the packet using \ac{SLIP} and transmit it to the At90CAN128.

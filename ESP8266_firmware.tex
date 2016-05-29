@@ -1,0 +1,37 @@
+The ESP8266 module was initially flashed with the Arduino \footnote{\url{https://github.com/esp8266/Arduino} last visited 29 Maj} bootloader.
+The modules supports \ac{OTA} \footnote{\url{https://github.com/esp8266/Arduino/blob/master/doc/ota\_updates/readme.md} last visited 29 Maj} which means the module can be flashed over WIFI instead of using a \ac{FTDI} cable.
+
+At first, the module had to be programmed using an \ac{FTDI} cable.
+The ESP8266 has a programm-pin that needs to be held high or low depending on whether the module should boot from its flash or if its about to be programmed.
+This pin was connected to the At90CAN128 in order to set the level of the pin without the need of jumpers on the \ac{PCB}. When the At90CAN128 boots, it pulls the programming-pin high or low depending on a define.
+It can thus easily be chosen whether the ESP8266 module should boot or be programmed.
+After the Arduino bootloader was flashed, there was no need to further use the \ac{FTDI} cable.
+
+The ESP8266 is run in a super-loop meaning it treats UDP packages as fast as possible. The code in \ref{code:esp8266_code} shows the main part of the code running on the ESP8266 module.
+
+\begin{lstlisting}[language = C++, caption = Snippet from loop() shows how it processes frames. When a UDP packet is available\, its size is compared with the expected size of a fame. It then loops through each byte received and runs the SLIP encapsulation, label=code:esp8266_code]
+// loop
+int packetSize = UDP.parsePacket();    
+if(packetSize == PACKET_SIZE){
+   	Serial.write(SLIP_END);
+    for(int i = 0; i < PACKET_SIZE; i++){
+    		switch(packetBuffer[i]){
+       		case SLIP_END:
+       	      Serial.write(SLIP_ESC);
+       	      Serial.write(SLIP_ESC_END);
+       	    break;         
+       	    case SLIP_ESC:
+       	      Serial.write(SLIP_ESC);
+       	      Serial.write(SLIP_ESC_ESC);
+       	    break;
+       	    default:
+       	      Serial.write(packetBuffer[i]);
+		}
+	}
+	Serial.write(SLIP_END);
+}
+// End loop
+\end{lstlisting}
+
+The \ac{SLIP} protocol has been used to encapsulate frames sent by the ESP8266 and received by the At90CAN128 in order to know when a frame is beginning and ending. 
+The naive implementation of separating frames would be to use a special character as separator. However this fails if the separator occurs as part of string. Instead \ac{SLIP}\footnote{Tee slip protocol is described in details in \url{https://tools.ietf.org/html/rfc1055} last visited 29 Maj} is used to handle escaping the separator if it occurs in the data.
