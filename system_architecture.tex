@@ -8,7 +8,7 @@ Each drone receives its position and sends it into the M4 flight controller over
 \begin{figure}[H]
     \center
     \includegraphics[width=1\textwidth]{graphics/system_architecture_indoor_all.png}
-    \caption{Diagram showing system architecture when using indoor. The markers used to track the drones is shown below the camera.}
+    \caption{Diagram showing system architecture when used indoor. The markers used to track the drones is shown below the camera.}
     \label{fig:indoor_information_flow}
 \end{figure} 
 
@@ -48,11 +48,10 @@ The initial idea was to also send the velocities of the drone and the accuracies
 The drone is a Ladybird using a \ac{AQ} M4 as flight controller with a modified version of the firmware.\footnote{AQ M4 firmware is described in section \ref{sec:aq_m4_firmware}} Is has an extension-board that enables it to receive positions from WIFI and inject them into the \ac{AQ} M4 over \ac{CAN}. \footnote{The extension-board is described in section \ref{sec:autoquad_extension_board}}
 \begin{itemize}
 	\item \textit{ESP8266}\footnote{The firmware running on the ESP8266 module is described in section \ref{sec:exp8266_firmware}} receives the UDP packet sent from the computer running \ac{ROS}. When a frame is received, it checks if the received number of bytes it correct. If so, it encapsulates the packet using \ac{SLIP} and transmit it to the At90CAN128.
-	\item \textit{At90CAN128} receives the encapsulated packet, decapsulate it, verify the CRC and transmit the packet to the \ac{AQ} M4 over \ac{CAN}.
+	\item \textit{At90CAN128} receives the encapsulated packet, decapsulate it, verify the CRC and transmit the packet to the \ac{AQ} M4 over \ac{CAN}. Tables \cref{tab:CAN_DOC_LAT,tab:CAN_DOC_LON,tab:CAN_DOC_VEL,tab:CAN_DOC_ALT,tab:CAN_DOC_DOP,tab:CAN_DOC_ACC} show the CAN-messages send to the \ac{AQ} M4.
 \end{itemize}
 
 
-Tables \cref{tab:CAN_DOC_LAT,tab:CAN_DOC_LON,tab:CAN_DOC_VEL,tab:CAN_DOC_ALT,tab:CAN_DOC_DOP,tab:CAN_DOC_ACC} show the CAN-messages send to \ac{AQ}.
 \begin{multicols}{2}
 \begin{table}[H]
 	\begin{tabular}{@{}|l|l|@{}}
@@ -111,29 +110,29 @@ Tables \cref{tab:CAN_DOC_LAT,tab:CAN_DOC_LON,tab:CAN_DOC_VEL,tab:CAN_DOC_ALT,tab
 	\caption{CAN messages to \ac{AQ} containing accuracies of 1 byte and heading in 2 bytes} 
 \end{table}
 
-\subsubsection*{Network configuration} 
-The WIFI  network for handling the communication between the PC and the drones had to be configured \footnote{See section \ref{sec:wireless_communication_module}}.
+\subsubsection*{Network configuration}  \label{sec:network_configuration}
+The WIFI  network for handling the communication between the PC and the drones had to be configured \footnote{Wireless communication chosen in  section \ref{sec:wireless_communication_module}}.
 The PC was configured as an access point for each extension-board to join. The access point was setup using an Asus USB-N13\footnote{Not available on AUSUS' webpage.} netcard and hostapd\footnote{https://w1.fi/hostapd/} as software. The network was configured as \ac{WPA2} to make it difficult for other to connect and start messing with the network.
 
-Instead of hardcoding an IP for each extension-board, which would be cumbersome each time a new firmware had to be deployed, a \ac{DHCP} server was configured on the PC. Since the IP might change next time the module connects, Multicast-DNS was configured on the ESP8266 and the PC. Each extension-board was giving a hostname eg. Drone1 so when the PC has to send a frame to Drone1, the underlaying networking will resolve the IP of Drone1.
+Instead of hardcoding an  \ac{IP} for each extension-board, which would be cumbersome each time a new firmware had to be deployed, a \ac{DHCP} server was configured on the PC. Since the IP might change next time the module connects, Multicast-DNS was configured on the ESP8266 and the PC. Each extension-board was giving a hostname eg. Drone1 so when the PC has to send a frame to Drone1, the underlaying networking will resolve the IP of Drone1.
 The ESP8266 has a small filesystem build-in which support creating a configuration file that could contain the hostname.
-When flashing the ESP8266 module the configuration file would not be overwritten and thereby still have the hostname of the module.\footnote{Due to lack of time the configuration file was not made, and the hostname was hardcoded in the ESP8266 firmware.}
+When flashing the ESP8266 module the configuration file\footnote{Due to lack of time the configuration file was not made, and the hostname was hardcoded in the ESP8266 firmware.} would not be overwritten and thereby still have the hostname of the module. Instead of using hostnames the \ac{IP} of the drone could be entered in the configuration file, however this would make it less portable since the PC would always have to be on the same \ac{IP}-range.
 
 
 \subsection{Outdoor}
 \begin{figure}[H]
     \center
     \includegraphics[width=0.7\textwidth]{graphics/system_architecture_outdoor.png}
-    \caption{Diagram shows information flow when using outdoor flying. The RTK-GNSS provides a absolute position which is read and converted to CAN messages by the Raspberry PI}
+    \caption{Diagram shows information flow when used outdoor. The RTK-GNSS provides a absolute position which is read and converted to CAN messages by the Raspberry PI}
     \label{fig:outdoor_information_flow}
 \end{figure}
 
-The \ac{RPi} is also running \ac{ROS} since it uses two components from Frobomind\footnote{\url {http://frobomind.org/}}. \begin{itemize}
+The \ac{RPi} is also running \ac{ROS} since it uses two components from Frobomind\footnote{\url {http://frobomind.org/} last visited 29 Maj}. \begin{itemize}
 	\item \textit{serial\_nmea\_node} is used to read and write from the serial port. Further more it decodes the NMEA string sent by the \ac{RTK-GNSS}
 	\item \textit{can\_socket\_node} is used to communicate with the \ac{CAN}-adapter\footnote{PEAK-CAN Adapter has been used in this project}
 \end{itemize}
 
-When a GPGGA/GPRMC nmea \footnote{\url{http://www.gpsinformation.org/dale/nmea.htm} last visited 28 Maj} message is received from the \ac{RTK-GNSS} its read by the \textit{serial\_nmea\_node} node. It is then sent to the \textit{AQ\_msg\_conv} node which simply converts the content of the GPGGA/GPRMC to CAN-messages shown in \cref{tab:CAN_DOC_LAT,tab:CAN_DOC_LON,tab:CAN_DOC_VEL,tab:CAN_DOC_ALT,tab:CAN_DOC_DOP,tab:CAN_DOC_ACC}  received.
+When a GPGGA/GPRMC nmea \footnote{\url{http://www.gpsinformation.org/dale/nmea.htm} last visited 28 Maj} message is received from the \ac{RTK-GNSS} its read by the \textit{serial\_nmea\_node} node. It is then sent to the \textit{AQ\_msg\_conv} node which simply converts the content of the GPGGA/GPRMC to CAN-messages shown in \cref{tab:CAN_DOC_LAT,tab:CAN_DOC_LON,tab:CAN_DOC_VEL,tab:CAN_DOC_ALT,tab:CAN_DOC_DOP,tab:CAN_DOC_ACC}  . \\
 
-Even though the positioning is shown using vision and \ac{RTK-GNSS}, other sources of positioning can be used as well. The same code is running on the AQ M4 whether vision or \ac{RTK-GNSS} is used, so if other positioning systems should be used one should implement the CAN protocol shown in appendix \ref{app:aq_can_protocol}.
-If using CAN is not possible a \ac{RPi} and \ac{CAN}-adapter can be used as intermediate, then the \textit{serial\_nmea\_node} and \textit{AQ\_msg\_conv} should be replaced.
+Even though the positioning is shown using vision and \ac{RTK-GNSS}, other sources of positioning can be used as well. The same code is running on the \ac{AQ} M4 whether vision or \ac{RTK-GNSS} is used, so if other positioning systems should be used one should implement the \ac{CAN} protocol shown in appendix \ref{app:aq_can_protocol}.
+If using \ac{CAN} is not possible a \ac{RPi} and \ac{CAN}-adapter can be used as intermediate, but then the \textit{serial\_nmea\_node} and \textit{AQ\_msg\_conv} should be replaced.
