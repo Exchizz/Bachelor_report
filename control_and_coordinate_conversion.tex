@@ -1,6 +1,7 @@
-\textit{In order to send \ac{LLH} to the \ac{AQ} M4 when obtaining the position from the MarkerLocator, there has to be made some transformation and coordinate conversion.}
+\textit{This section concerns controlling the drones and converting between coordinates. To send \ac{LL} to the \ac{AQ} M4 when obtaining the position from the MarkerLocator, there has to be made a transformation and coordinate conversion in order for \ac{AQ} M4 to know where it is in the world. This section will first describe the coordinate conversion and then how to control the drones}
 
-The \textit{Decision\_Maker} shown in figure \ref{sec:system_architecture_indoor} is at the moment of writing responsible for converting between centimes from the MarkerLocators to \ac{LLH} which is sent to the AQ M4. Figure \ref{fig:coordinate_flow} shows how the coordinates are converted.
+\subsection{Coordinate conversion}
+The \textit{Decision\_Maker} shown in figure \ref{sec:system_architecture_indoor} is at the moment of writing responsible for converting between centimeters from the MarkerLocators to \ac{LL} in decimal degrees which is sent to the AQ M4. Figure \ref{fig:coordinate_flow} shows how the coordinates are converted.
 
 \begin{figure}[H]
     \center
@@ -9,25 +10,37 @@ The \textit{Decision\_Maker} shown in figure \ref{sec:system_architecture_indoor
     \label{fig:coordinate_flow}
 \end{figure}
 
-It might however be a more generic design to split the current \textit{Decision\_Maker} into three nodes in order to avoid doing coordinate conversation within each \textit{Decision\_Maker} node. If a drones position is used twice, the same calculates happens twice as the \textit{Decision\_Maker} is currently designed.\\
+The dotted square in figure \ref{fig:coordinate_flow} shows the coordinate conversation flow within the \textit{Decision\_Maker}-node.
+The MarkerLocator provides a position in the unit of centimeters\footnote{This should be changed to meters, it was not changed due to lack of time} which gets added to a defined offset.
+If no offset is defined , the drones would be flying around lat = 0, lon = 0, which is in the middle of the ocean.
+The location of SDU's RoboLab was chosen since plotting \ac{LL} will then be shown in QGroundcontrol as if flying is happening in RoboLab, however this is not required.
+Another advantage of using RoboLab as offset is, that \ac{UTM} zone(32) is already specified and tested working in the \ac{UTM}-converter\footnote{Frobomind's UTM converted was used, \url{https://github.com/FroboLab/frobomind/tree/master/fmLib/math/geographics/transverse_mercator/src} last visited 29 Maj} used.
 
-Figure \ref{fig:coordinate_flow} shows the coordinate conversation flow whith the \textit{Decision\_Maker}-node.
-The MarkerLocator provides a position in the unit of centimeters\footnote{This should be changed to meters, it was not done due to lack of time} which gets added to a defined offset.
-If no offset is defined it would be in lat = 0, lon = 0, which is in the middle of the ocean.
-The location of SDU's RoboLab was chosen since plotting lat/lon will then be in RoboLab, however this is not required. Another advantage of using RoboLab is, the \ac{UTM} zones\footnote{How UTM works out of the scope of this project.} is already specified and tested working in the \ac{UTM}-converted\footnote{Frobomind's UTM converted was used, \url{https://github.com/FroboLab/frobomind/tree/master/fmLib/math/geographics/transverse_mercator/src} last visited 29 Maj} used.
-When the offset is converted into meters it can be added to the MarkerLocators output.
-Since UTM works in northing and easting the x,y axes of the MarkerLocator have to be aligned with north and east.
-How the cameraframes axes is laying with respect to the north is a matter of how the homography was made in section \ref{sec:perspective_correction}.
+When the offset is converted into meters it can be added to the MarkerLocators output which also has to be converted into meters.
+Since UTM works in northing and easting the x,y axes of the MarkerLocator have to be aligned with north and east axes. Whether y is north or easting  depends on which axes convention is used.
+The \ac{ENU} axes convention has been used, however \ac{NED} could have been used as well.
+How the camera-frames quadrant is laying in the frame is a matter of how the homography was made insection \ref{sec:perspective_correction}.
 
-The camera mounted below the ceiling to track the drones was align with north by coincidence so the x,y could simply be added to the northing and easting of the \ac{UTM} converted.
+The camera mounted below the ceiling used to track the drones was align with north by coincidence so that x,y could simply be added to the northing and easting respectively of the \ac{UTM} converted.
 
-Figure \ref{fig:coordinate_frames} shows the coordinate frame of the camera with respect to north in RoboLab.
+Figure \ref{fig:coordinate_frames} shows the coordinate-frame of the camera with respect to north and East in RoboLab.
 
 \begin{figure}[H]
     \center
     \includegraphics[width=0.9\textwidth]{graphics/coordinate_frames.png}
-  	\caption{Robolab is shown south/west of the bulding. The frame in which the MarkerLocator provides output in is shown with blue arrows. The x-axis is aligned with east and y is aligned with north. The offset used is the origo of the coordinate system}
+  	\caption{Picture generated from Google Maps. Rob The frame in which the MarkerLocator provides output in is shown with blue arrows. The x-axis is aligned with east and y is aligned with north. The offset used is the origo of the famera-frames coordinate system}
     \label{fig:coordinate_frames}
 \end{figure}
 
-If alignment of the camera-frame with north was not possible, the coordinate frame can be rotated using the rotation matrix\cite{ROB5 bog}.
+If alignment of the camera-frame with north was not possible, the coordinate frame can be rotated using the rotation matrix\cite{Choset_2005_5167}.
+
+In figure \ref{fig:coordinate_flow} the manipulation and control happens in meters but converted back to \ac{LL} in decimal degrees and sent to AQ M4 board.
+
+\subsection{Control and manipulation of drones position}
+The initial idea was to send waypoints to the AQ M4-boards, however this requires an extension-board used for telemetry mounted on the drones. Since only one extension-board can be mounted on the AQ M4 board, no telemetry was available and is thereby not available to send waypoints when it is airborne. \\
+Instead it was chosen to control the drone by manipulating its belief in where it is.
+If the drone is supposed to fly to the right, its being manipulated to belief it is more to the left than it is in order to make it fly to the right. Eg. the drone is in (x = 0,y = 0) and it has to go to (x = 1, y = 0).
+Instead of giving it a waypoint telling it to go to 1,0, it is told that its position is (-1,0) and thereby gets tricked into flying to (1,0). In order for this to work, the AutoQuad M4 should be in \textit{Position-Hold}-mode which is set by a switch on the transmitter.
+
+
+A more generic design of the \textit{Decision\_Maker} would have been to split the current \textit{Decision\_Maker} into three nodes in order to avoid doing coordinate conversation within each \textit{Decision\_Maker} node. A node before the \textit{Decision\_Maker} to handle camera-frame transformation and a node after to convert the coordinates to \ac{LL}.
