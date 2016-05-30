@@ -88,7 +88,7 @@ This method does not provide a scalar as output but a binary and thereby has no 
 
 During development of quality measures it was noted that if the MarkerLocator does a full search because it cannot find a marker with order 4, it slows down the detection of the marker of order 6. This is because the MarkerLocator is implemented in one process without threading. However this has been solved by splitting up the MarkerLocator in different processes so they run independently of each other. More about this in section  \ref{sec:system_architecture_indoor} \\
 
-\textbf{Perspective correction} \\
+\subsection{Perspective correction}  \label{sec:perspective_correction}
 In order to use centimeters as measure of the position of the markers and to correct if the camera is not pointing directly down, the build-in perspective correction in the MarkerLocator were used.
 It works by using homography\cite{janeriksolem2012} to make the transformation from pixels to some chosen unit which in this case is centimeters.
 \begin{wrapfigure}{r}{0.4\textwidth}

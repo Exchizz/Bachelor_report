@@ -1,0 +1,33 @@
+\textit{In order to send \ac{LLH} to the \ac{AQ} M4 when obtaining the position from the MarkerLocator, there has to be made some transformation and coordinate conversion.}
+
+The \textit{Decision\_Maker} shown in figure \ref{sec:system_architecture_indoor} is at the moment of writing responsible for converting between centimes from the MarkerLocators to \ac{LLH} which is sent to the AQ M4. Figure \ref{fig:coordinate_flow} shows how the coordinates are converted.
+
+\begin{figure}[H]
+    \center
+    \includegraphics[width=1\textwidth]{graphics/coordinate_conversion_flow.png}
+  	\caption{Shows how the coordinates are converted from centimeters, added to a lat/lon offset, converted to meters, manipulated and converted to lat/lon}
+    \label{fig:coordinate_flow}
+\end{figure}
+
+It might however be a more generic design to split the current \textit{Decision\_Maker} into three nodes in order to avoid doing coordinate conversation within each \textit{Decision\_Maker} node. If a drones position is used twice, the same calculates happens twice as the \textit{Decision\_Maker} is currently designed.\\
+
+Figure \ref{fig:coordinate_flow} shows the coordinate conversation flow whith the \textit{Decision\_Maker}-node.
+The MarkerLocator provides a position in the unit of centimeters\footnote{This should be changed to meters, it was not done due to lack of time} which gets added to a defined offset.
+If no offset is defined it would be in lat = 0, lon = 0, which is in the middle of the ocean.
+The location of SDU's RoboLab was chosen since plotting lat/lon will then be in RoboLab, however this is not required. Another advantage of using RoboLab is, the \ac{UTM} zones\footnote{How UTM works out of the scope of this project.} is already specified and tested working in the \ac{UTM}-converted\footnote{Frobomind's UTM converted was used, \url{https://github.com/FroboLab/frobomind/tree/master/fmLib/math/geographics/transverse_mercator/src} last visited 29 Maj} used.
+When the offset is converted into meters it can be added to the MarkerLocators output.
+Since UTM works in northing and easting the x,y axes of the MarkerLocator have to be aligned with north and east.
+How the cameraframes axes is laying with respect to the north is a matter of how the homography was made in section \ref{sec:perspective_correction}.
+
+The camera mounted below the ceiling to track the drones was align with north by coincidence so the x,y could simply be added to the northing and easting of the \ac{UTM} converted.
+
+Figure \ref{fig:coordinate_frames} shows the coordinate frame of the camera with respect to north in RoboLab.
+
+\begin{figure}[H]
+    \center
+    \includegraphics[width=0.9\textwidth]{graphics/coordinate_frames.png}
+  	\caption{Robolab is shown south/west of the bulding. The frame in which the MarkerLocator provides output in is shown with blue arrows. The x-axis is aligned with east and y is aligned with north. The offset used is the origo of the coordinate system}
+    \label{fig:coordinate_frames}
+\end{figure}
+
+If alignment of the camera-frame with north was not possible, the coordinate frame can be rotated using the rotation matrix\cite{ROB5 bog}.
