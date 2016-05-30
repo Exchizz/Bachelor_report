@@ -1,0 +1,42 @@
+In order to know the required bytes to send latitude and longitude with a precision of 1 cm, the author used the datum WGS84\footnote{WGS-84 used in AQ} to estimate the worst-case error at equator. 
+
+WGS-84 \footnote{\url{http://www.unoosa.org/pdf/icg/2012/template/WGS_84.pdf} last visited 22 maj} states that the semi-major-axis(a) of the earth is 6378137.0 m and that the flattening factor is 1/298.257223563. From these two values the semi-minor-axis(b) can be calculated using equation \ref{eq:raduis}
+\begin{equation}
+b=a \cdot (1-\frac{1}{298.257223563})
+\end{equation} \label{eq:raduis}
+Given the formula of the circumference of an ellipsoid:
+\begin{equation}
+circumference = 2 \cdot \pi \sqrt{ \frac{1}{2}(a^2+b^2)}
+\end{equation} \label{eq:circum}
+Equation \ref{eq:circum} gives a circumference at equator of 39873752.0 meters.
+
+By dividing 39873752.0 by 360, one get how many meters pr. degree.
+\begin{equation}
+\frac{39873752.0}{360} = 110760 \frac{m}{deg}
+\end{equation}
+
+Table \ref{tab:precision_latlon} was made to see how many decimals is required to obtain different precisions.
+\begin{table}[H]
+\centering
+\caption{Table shows precision required}
+\label{tab:precision_latlon}
+\begin{tabular}{@{}|l|l|l|@{}}
+\toprule
+Decimal place & Decimal degrees & Distance    \\ \midrule
+0             & 1               & 110760 m    \\ \midrule
+1             & 0.1             & 11076.0 m   \\ \midrule
+...           & ..              & ...         \\ \midrule
+7             & 0.0000001       & 7.75323 cm  \\ \midrule
+8             & 0.00000001      & 0.775323 cm \\ \bottomrule
+\end{tabular}
+\end{table}
+
+It can be seen that 8'th decimal is necessary to get below 1 cm. 
+To see if a float can handle number smaller than $1\cdot e-8$, \textit{eps} from MatLab was used\footnote{http://se.mathworks.com/help/matlab/ref/eps.html}.
+\begin{lstlisting}[language = matlab, caption = Check if float is precise enough of a double has to be used, label=code:eps_single]
+eps(single(180.0)) = 1.5259e-05
+eps(double(180.0)) = 2.8422e-14
+\end{lstlisting}
+In code \ref{code:eps_single} eps is given with 180 as input since 180 is the largest integer possible with using latitude and longitude.
+It can be seen that the smallest number a float can represent is 1.5259e-05 but a precession of $1\cdot e-8$ is needed.
+However a double can easily handle that which makes the latitude and longitude of the CAN-messages 8 bytes each. \\

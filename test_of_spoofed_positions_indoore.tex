@@ -3,7 +3,6 @@ The purpose of this test was to see if the GPS coordinates was spoofed correctly
 
 A rosbag was used to collect data from the GPS since it publishes data to a topic when played as a node did when the recording took place. This results in no code has to be written and when the code works with a rosbag it also works when it is replaced with a node providing real-world data. \\
 
-\textbf{Test}
 \begin{figure}[H]
     \center
     \includegraphics[width=0.8\textwidth]{graphics/Indoore_test_spoofed_can.png}
@@ -21,12 +20,12 @@ The code written by the author will then subscribe to \textit{/fmData/nmea\_from
 \begin{figure}[H]
     \center
     \includegraphics[width=0.6\textwidth]{graphics/test_test_setup_hw.jpg}
-  \label{fig:boat1}
+  \label{fig:test_setup_indoor}
   \caption{Test-setup shown}
 \end{figure}
 
 
-The Rpi is connected directly to the PC using the orange ethernet cable.
+Figure \ref{fig:test_setup_indoor} shows the RPi is connected directly to the PC using the orange ethernet cable.
 The rosbag was stored and played on the PC, so the ethernet cable were used to share rostopics between the PI and the PC. The roscore where running on the PC.\\
 The Ladybird drone is connected to the RPI using a PEAK CAN-adapter to transfer CAN messages. The Ladybird is powered by the white USB-cable and to show the position of the drone in QgroundStation. The PC is connected to the drone using ST-Link SWD to easier start, stop and restart the drones firmware during the test. To access a \ac{TTY} on the PI, an FTDI cable has been connected to the PC.
 

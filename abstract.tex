@@ -1,6 +1,7 @@
 Up until now drones keeps getting bigger and larger to carry bigger batteries with more capacity and to lift heavier payloads. This has lead to drones getting less efficient, less responsive and more dangerous. 
 Lately it has become more popular to make small collaborative drones to solve the task.
 
+\Mathias{Skal omskrives til sidst}
 (Materials \& methods) \\
 This thesis describes how to make three drones follow a leader drone with a preprogrammed path as an example of drones cooperating. A Linux PC running MarkerLocator tracks each drones position and wirelessly transmits, using Xbee, the drones positions to all drones.The position of each drone is spoofed into the drone using the CAN-bus and thereby overwriting the onboard GPS. An outdoor test has been made using the onboard GPS to test the leader-follower algorithm in a bigger scale. A small PCB has been developed and mounted on each drone to route packages from the Xbee module to the CAN-bus of the drone and to measure the local altitude of the drone using a ultrasonic sensor. The PCB carries an AT90CAN128 as microcontroller which build-in CAN support making it obsolete to carry an external USB CAN-controller.\\
 

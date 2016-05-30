@@ -1,19 +1,20 @@
-\textbf{Introduction}
-The purpose of this test was to see if the GPS spoofing worked when the drone was airborn. The same hardware and software were used as in section \ref{sec:test_of_spoofed_positions_indoore}, though with a few changes.
+\textit{The purpose of this test was to see if the GNSS spoofing worked when the drone was airborn. The same hardware and software were used as in section \ref{app:test_of_spoofed_positions_indoore}, though with a few changes.
+The GNSS used in test 1 to collect coordinates were mounted on the EduQuad.
+The idea was to pass-through the GNSS coordinates from the Neo 6-P GPS to AQ. If the CAN spoofing works as expected the drone should behave normally when flying in position-hold mode.}
+\begin{figure}[H]
+    \center
+    \includegraphics[width=0.6\textwidth]{graphics/test_outdoore_mounts.eps}
+  \caption{The EduQuad drone with the hardware used in the test. The figure shows the Raspberry PI, PEAK-CAN adaptor, green Neo-6p GPS and extra battery for the Raspberry Pi}
+    \label{fig:eduquad_bottom_up}
+\end{figure}
 
-The GPS used in test 1 to collect coordinates were mounted on the EduQuad.
+Figure \ref{fig:eduquad_bottom_up} shows how the hardware were mounted on the EduQuad. It was temporary mounted with strips and tape to avoid short circuiting and getting the wires into the robots.
+An extra battery was mounted on the drone to supply the RPi. The ROS nodes running on the Rpi had to be start up before AQ starts registering notes on the CAN-bus. If the nodes was not started up, they would not reply to AQs reset-msg it sends when it is booting. 
 
-The idea was to pass-through the GPS coordinates from the Neo 6-P GPS to AQ. If the CAN spoofing works as expected the drone should behave normally when flying in position-hold mode.
-
-\textbf{Test}
-
-Figure \ref{fig:eduquad_bottom_up} shows how the hardware were mounted on the EduQuad. It was temporary mounted with strips and tape to avoid short circuiting. \Mathias{Opdater billede med test-equipment} 
-
-In test 1 the altitude of the drone was hardcoded since it had no relevance  in the test. Though in test 2 if was necessary since the UKF\footnote{\url{https://github.com/bn999/autoquad/blob/master/onboard/run.c\#L111}} uses the altitude from the GPS to estimate the position of the drone. Furthermore the following check where inserted to make sure only valid GPS coordinates were fed into the AQ:
+In test 1 the altitude of the drone was hardcoded since it had no relevance in the test. Though in test 2 if was necessary since the UKF\footnote{\url{https://github.com/bn999/autoquad/blob/master/onboard/run.c\#L111}} uses the altitude from the GNSS to estimate the position of the drone. Furthermore the checks shown in code \ref{code:initial_ourdoor_test_code} where inserted to make sure only valid GNSS coordinates were fed into AQ.
 \begin{center}
-
 \begin{minipage}{\textwidth}
-		\begin{lstlisting}[language = c++, caption = Quality checks added to discard bad positions, label=code:pseudo_tx]
+		\begin{lstlisting}[language = c++, caption = Quality checks added to discard bad positions, label=code:initial_ourdoor_test_code]
 // default low accuracy
 gpsData.hAcc = 5; // Meters
 gpsData.vAcc = 5; // Meters
@@ -39,21 +40,12 @@ if(gpsData.fix == 1){ // Single point solution
 		\end{lstlisting}
 \end{minipage}
 \end{center}
-
-\begin{figure}[H]
-    \center
-    \includegraphics[width=0.6\textwidth]{graphics/test_outdoore_mounts.eps}
-  \caption{The EduQuad drone with the hardware used in the test}
-    \label{fig:eduquad_bottom_up}
-\end{figure}
-An extra battery was mounted on the drone to supply the Rpi. The ROS nodes running on the Rpi had to be start up before AQ starts registering notes on the CAN-bus. If the nodes was not started up, they would not reply to AQs reset-msg it sends when it is booting. \\
-
-When the ROS-node were connected to the CAN bus, it showed that the ROS-node needed extra checking on CAN messages in order to detect difference between messages targeted the ROS-node and messages targeted the ESC32-nodes.
+When the ROS-node was connected to the CAN bus, it showed that the ROS-node needed extra checking on CAN messages in order to detect difference between messages targeted the ROS-node and messages targeted the ESC32-nodes.
 
 
 A bug in the \textit{can\_socketcan} -node used to communicate with the Peak-Can adapter where found a fixed. It was later on merged back into Frobomind \footnote{\url{https://github.com/FroboLab/frobomind/pull/12}}
-\textbf{Conclusion} \\
 
+\subsubsection{Conclusion}
 The test did not go as expected. The test was carried out under a time pressure since the author's supervisor only had 30 minutes to carry out the test.
 
 The author did though gain experience when having multiple CAN devices connected to the CAN-bus.
@@ -63,10 +55,10 @@ Several things went wrong through the test:
 	\item The onboard GPS was not disabled
 	\item The author accidentally forgot to set the DOP values used in AQ
 	\item No reference flight after the firmware were flashed for the first time.
-	\item The GPS antenna was not mounted in the middle of the frame as the onboard antenna.
+	\item The GNSS antenna was not mounted in the middle of the frame as the onboard antenna.
 \end{itemize}
 
-Figure \ref{fig:qground_station_dop} shows the DOP value is lowering witch indicates that AQ was using its onboard GPS.
+Figure \ref{fig:qground_station_dop} shows the DOP value is lowering witch indicates that AQ was using its onboard GNSS.
 
 \begin{figure}[H]
     \center
@@ -74,6 +66,3 @@ Figure \ref{fig:qground_station_dop} shows the DOP value is lowering witch indic
   \caption{Plot of h/vDOP from logs when the drone was airborn}
     \label{fig:qground_station_dop}
 \end{figure}
-
-The test will be carried out again.
-

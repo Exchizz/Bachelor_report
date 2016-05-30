@@ -1,4 +1,4 @@
-\textit{In order to do indoor flying there is a need of some sort of localization since GPS is not available indoor. Vision was decided based on what mostly others are using and some further advantages. Instead of making the vision, it is decided to use an existing tracker called MarkerLocator written by Henrik Midtiby. However the MarkerLocator lacks a proper quality measure so that is implemented. A few tests were made and the MarkerLocator with implemented quality measure is working quite well}
+\textit{In order to do indoor flying there is a need of some sort of localization since GNSS is not available indoor. Vision was decided based on what mostly others are using and some further advantages. Instead of making the vision, it is decided to use an existing tracker called MarkerLocator written by Henrik Midtiby. However the MarkerLocator lacks a proper quality measure so that is implemented. A few tests were made and the MarkerLocator with implemented quality measure is working quite well}
 
 
 In order to do accurate flying indoor a localization system is needed. In the Related Work section, it can be seen vision with a camera mounted pointing down is used by others. Compared to use one or more cameras mounted on the drone, an advantage of using a camera mounted on the ceiling is that the camera will not be harmed if the drone crashes and that one camera can be used to detect several drones. However if the position is needed in more than 2D, more than one camera might be needed(depending on the algorithm used) but it still scales better than mounting one or more cameras on each drone. \\
@@ -19,7 +19,7 @@ Based on previous experience, the MarkerLocator written by Henrik Midtiby was ch
     \begin{subfigure}[b]{0.2\textwidth}
         \includegraphics[width=\textwidth]{graphics/marker_order_6.pdf}
         \caption{Marker of order 6 used to get the 2D position of a drone}
-        \label{fig:markerlocator_order_4}
+        \label{fig:markerlocator_order_6}
     \end{subfigure}
     \caption{The markers have one arm less than the order of the marker for the MarkerLocator to detect the orientation of the marker}\label{fig:markerlocator_marker}
 \end{figure}

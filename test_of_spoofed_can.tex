@@ -1,19 +1,12 @@
-Testing of the spoofed GNS was split intro two subtests. \\
-The first test was conducted in order to validate the GPS spoofing using the CAN-bus works when the drone is laying on a table. \\
-Test 1 can be seen in \ref{sec:test_of_spoofed_positions_indoore}.\\
-The second test was conducted as the first test, but when the drone is airborn.\\
-Test 2 can be seen in \ref{sec:test_of_spoofed_positions_outdoore}
+Testing of the spoofed GNSS was split intro three subtests.
+\begin{itemize}
+	\item Test first test was done indoor where the drone were laying on a table. See test in  \ref{app:test_of_spoofed_positions_indoore}.
+	\item The second test was conducted as the first test, but when the drone. was airborn See test in \ref{app:test_of_spoofed_positions_outdoore}
+	\item The third test was done by walking with the drone and comparing the onboard GNSS on the AQ M4 board and an external GPS. See test in \ref{app:Comparesion_of_onboard_and_spoofed_GNSS}
+\end{itemize}
 
+%Test 2 can be seen in \ref{sec:test_of_spoofed_positions_outdoore}
 
-
-----------------------------------\\
-Figure Y shows the waypoint list uploaded to the drone. It is expected that the drone will behave as if it was using its onboard GPS.
-The GPS positions will be gathered in a rosbag to be used later on in test2.
-A flight with the onboard GPS will be done in order to have a reference flight.\\
-\textbf{Testx}
-Test two will be conducted much the same way as test1. However the GPS will be replaced with a lightweight RTK GPS. The RTK GPS positions will also be saved in a rosbag for later analyse. Is is expected that when using the RTK GPS the drone is closer to its waypoints  shown in figure Y, than when using a normal GPS.
-
-----------------------------------\\
 
 
 

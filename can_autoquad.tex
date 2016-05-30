@@ -64,7 +64,6 @@ Node 15 keeps transmitting its packet because it has lower identifier bits and t
     \caption{Example of CAN arbitration where node 15 has the lowest ID and thereby highest priority}
     \label{tab:can_arbitration}
 \end{figure}
-\newpage
 LLC in a message can take one of the defines in code \ref{code:llc_defines}
 \begin{lstlisting}[language = c, caption = LLC defines, label=code:llc_defines]
 #define CAN_LCC_EXCEPTION   ((uint32_t)0x0<<30)
@@ -110,9 +109,8 @@ Different types of functions can be seen in code \ref{code:function_defines}
 
 Table \ref{tab:fid_descriptions} describes the FIDs shown in listing \ref{code:function_defines}. \\
 
-\Mathias{Dette er forkert, eftersom alle defines er taget fra AQ's can.h så der passer det..}
 If a message is if FID CAN\_FID\_CMD, the Data Object code will be used as the command.\\
-It should be noted from code \ref{code:function_defines} that the FID's is moved 25 positions to the left but FID is shown in table \ref{tab:can_identifier_bits} is at bits 22:25. 
+It should be noted from code \ref{code:function_defines} that the FID's is moved 25 positions to the left but FID is shown in table \ref{tab:can_identifier_bits} at bits 22:25. 
 The offset of three bits is due to the way ARM's CAN registers is implemented. The three initial bits in CAN\_TIxR and CAN\_RIxR (registers used to transmit and receive respectively) \footnote{\url{http://www2.st.com/content/ccc/resource/technical/document/reference_manual/59/b9/ba/7f/11/af/43/d5/CD00171190.pdf/files/CD00171190.pdf/jcr:content/translations/en.CD00171190.pdf:688}} registers are general information about the CAN messages like whether it is extended (Part B.0) or not.
 \begin{table}[H]
 \centering
@@ -151,8 +149,7 @@ void canProcessCmd(... ,uint8_t doc, ...) {
 }
 \end{lstlisting}
 
-In section \ref{sec:reg_aq_node} DOC is used by the author to tell which part of the GPS data is getting sent but where FID is CAN\_FID\_TELEM.
-\Mathias{Fixe ref til section om GPS spoof}
+In section \ref{app:reg_aq_node} DOC is used to tell which part of the GNSS data is getting sent but where FID is CAN\_FID\_TELEM.
 
 \subsubsection*{Source/Target/Network ID}
 When referred to source/target ID but without respect to either sender or receiver but just a CAN-node, then it is referred to as NetworkId. When a node registers itself in AQ, it gets assigned a NetworkId.
@@ -161,7 +158,7 @@ When referred to source/target ID but without respect to either sender or receiv
 The sequence id is incremented on transmission of each message. It is used when eg. 
 A CAN-node sends a reply to a get-message, it is then including the sequence id of the get-message so AQ knows what it receives a reply for.
 
-\subsubsection*{Data bits}
+\subsubsection*{Data bits} \label{app:data_bits}
 The data bytes does not have a general definition, it depends on the function id. With some FIDs the data field may contain additional parameters.\\ \\
 Eg. When FID is CAN\_FID\_REQ\_ADDR, data has the fields shown in table \ref{tab:packet_from_node}
 \begin{table}[H]
@@ -205,7 +202,7 @@ canData.uuid = XXH32((void *)CAN_UUID, 3*4, 0);
   {#3};
 }
 
-\subsubsection*{Registering a node in AQ}\label{sec:reg_aq_node}
+\subsubsection*{Registering a node in AQ}\label{app:reg_aq_node}
 
 When the AQ is starting up, it is transmitting a CAN\_FID\_RESET\_BUS to the bus.
 When each CAN-node receives the messages, they send out a CAN\_FID\_REQ\_ADDR message in order to get registered as a node in AQ.
@@ -265,7 +262,7 @@ while (timerMicros() < micros)
 
 AQ waits default 100 ms for nodes to request an address. If canProcessMessage() returns true a node tried to register and the registration period is extended 100 ms.
  
-\subsubsection*{Registering node test} \label{sec:reg_node_test}
+\subsubsection{Registering node test} \label{app:reg_node_test}
 Implementation of a CAN-node running on a PC was initially done in python. The python module \textit{SocketCan} \footnote{\url{http://python-can.readthedocs.io/en/latest/socketcan_native.html}} supports PeakCAN adapter out of the box.\\
 
 Code \ref{code:python_reg_node} shows a snippet of main.py.
@@ -312,12 +309,12 @@ It can be seen 4 motors were connected to the CAN bus, but also that the spoofed
     \label{fig:successful_register}
 \end{figure}
 
-\subsubsection*{Spoofed current test}
+\subsubsection{Spoofed current test}
 When an AQ PDB is mounted on a drone, the PDB measures voltage, current and temperature and sends the measurements to AQ where they get logged.\\
-The code in section \ref{sec:reg_node_test} was further developed into a sensor simulator that spoofs current measurements into AQ to test the registering works probably. \\
+The code in \ref{code:python_reg_node} was further developed into a sensor simulator that spoofs current measurements into AQ to test the registering works probably. \\
 A logger extension-board was mounted on the M4-board in order to save the measurements to a MicroSD-card.
 
-Code \ref{code:spoof_current} shows the implementation where a sinus is generated to simulate a current and how it is transmitted to AQ. \cite{someguy2993}
+Code \ref{code:spoof_current} shows the implementation where a sinus is generated to simulate a current and how it is transmitted to AQ. 
 
 \begin{lstlisting}[language = python, caption = Snippet spoofing current measurements into AQ, label=code:spoof_current]
 def ReqistrerTelem(self):

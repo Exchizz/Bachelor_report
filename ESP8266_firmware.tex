@@ -33,5 +33,5 @@ if(packetSize == PACKET_SIZE){
 // End loop
 \end{lstlisting}
 
-The \ac{SLIP} protocol has been used to encapsulate frames sent by the ESP8266 and received by the At90CAN128 in order to know when a frame is beginning and ending. 
-The naive implementation of separating frames would be to use a special character as separator. However this fails if the separator occurs as part of string. Instead \ac{SLIP}\footnote{Tee slip protocol is described in details in \url{https://tools.ietf.org/html/rfc1055} last visited 29 Maj} is used to handle escaping the separator if it occurs in the data.
+The \ac{SLIP} \footnote{Inspired by SLIP implementation provided by Kjeld Jensen} protocol has been used to encapsulate frames sent by the ESP8266 and received by the At90CAN128 in order to know when a frame is beginning and ending. 
+The naive implementation of separating frames would be to use a special character as separator. However this fails if the separator occurs as part of string. Instead \ac{SLIP}\footnote{The slip protocol is described in details in \url{https://tools.ietf.org/html/rfc1055} last visited 29 Maj} is used to handle escaping the separator if it occurs in the data.
