@@ -7,7 +7,7 @@ Much of the gained knowledge about \ac{AQ} and how to do debugging has been writ
 
 
 Since \ac{AQ} only supports receiving absolute positioning through a serial port\footnote{Seen by inspection of the schematic to the M4-board done by the supervisor} another way had to be found.
-The M4 board is born with an onboard ublox M8Q \footnote{\url{http://autoquad.org/wiki/wiki/m4-microcontroller/m4-gps-antenna-options/}} which uses ublox's ubx protocol. If the M8Q GNSS was repleace everything sent by eg. a RPI has to be encoded as ubx.
+The M4 board is born with an onboard ublox M8Q \footnote{\url{http://autoquad.org/wiki/wiki/m4-microcontroller/m4-gps-antenna-options/} last visited 29 Maj} which uses ublox's ubx protocol. If the M8Q GNSS was repleace everything sent by eg. a RPI has to be encoded as ubx.
 The CAN-bus was chosen since it is already implemented and used in \ac{AQ}. \ac{AQ} supports sensor inputs through CAN, unfortunately GNSS was not supported and thereby had to be implemented.
 
 \ac{AQ}s CAN protocol is described, implemented and tested in appendix \ref{app:aq_can_protocol}.
@@ -18,7 +18,8 @@ First a summary run which sends the number and types of the nodes to QGroundStat
 It can thus be validated by the pilot that all the ESC's and CAN-sensors are detected.
 After the summary the CAN-sensor initialization is invoked which creates a callback that gets attached to the CAN-type which in this case is CAN-sensor\footnote{CAN-types are described in section \ref{app:data_bits}}. When \ac{AQ} receives a sensor reading the callback will then be invoked nd the sensor value will be added to the array.\\
 
-The callback default fills in the received sensor value in an array so the sensor value can be used in another task. The canID \footnote{The canID is described in appendix \ref{app:data_bits}} is then used as index so the task that needs the sensor value knows on which element in the array too look. Code \ref{code:callback} shows the default callback \footnote{\url{https://github.com/bn999/autoquad/blob/master/onboard/canSensors.c} last visited 29 Maj}
+The callback default fills in the received sensor value in an array so the sensor value can be used in another task.
+The canID \footnote{The canID is described in appendix \ref{app:data_bits}} is used as index so the task that needs the sensor value knows on which element in the array to look. Code \ref{code:callback} shows the default callback \footnote{\url{https://github.com/bn999/autoquad/blob/master/onboard/canSensors.c} last visited 29 Maj}
 \begin{lstlisting}[language = c, caption = Callback invoked when a CAN-sensorvalue is received. It stores the value in an array indexed by canId. Note that the sensor value is casted to a float, label=code:callback]
 void canSensorsReceiveTelem(uint8_t canId, uint8_t doc, void *data) {
     canSensorsData.values[canId] = *(float *)data;
@@ -80,8 +81,8 @@ else if IsFlagSet(gpsData.gpsVelFlag) == yes then
 \end{lstlisting}
 
 Testing of the GNSS spoofing was done in cooperation with Kjeld Jensen since results was needed for the paper.
-Before mounting an expensive RTK-GNSS on the drone, it was tested using a NEO-6P  GPS. The tests can be seen in appendix \ref{app:test_of_spoofed_GNSS}
-After testing was successful using the NEO-6P, the RTK-GNSS was mounted on the EduQuad.
+Before mounting an expensive RTK-GNSS on the drone, it was tested using a NEO-6P GPS. The tests can be seen in appendix \ref{app:test_of_spoofed_GNSS}
+When testing was successful using the NEO-6P, the RTK-GNSS was mounted on the EduQuad.
 Figure \ref{fig:rtk_test_route} shows the waypoints generated to test the performance of the RTK-GNSS and the tracked path.
 
 \begin{figure}[H]
