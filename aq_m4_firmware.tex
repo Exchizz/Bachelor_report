@@ -104,8 +104,6 @@ The 95’th percentile was 1.11 m and the maximum distance was 1.35 m.
 Figure \ref{fig:rtk_test_hist} shows a histogram of the horizontal lateral distances from the planned route.
 The average vertical distance from the route was 0.26 m, the 95’th percentile was 0.72 m and the maximum distance was 1.52 m.} \footnote{Jensen, K.; Larsen, R.; Laursen M.S.; Neerup, M.M.; Skriver, M. and Jørgensen, R.N. Towards UAV contour flight over agricultural fields using RTK-GNSS and a Digital Height Model}
 
-The reason for the relatively low accuracy of flying with the RTK-GNSS is out of the scope of this project.
-
 \begin{figure}[H]
     \center
     \includegraphics[width=0.7\textwidth]{graphics/rtk_test_hist_dist.png}
@@ -114,4 +112,6 @@ route during the experiment. The total number of GPS track points (samples) is 7
     \label{fig:rtk_test_hist}
 \end{figure}
 
-It can be concluded that it is possible to inject absolute GNSS positions into the \ac{AQ} M4 board over \ac{CAN}. The tests made in appendix \ref{app:test_of_spoofed_GNSS} shows it is possible to decide how much the UKF should trust the GNSS positions based on the DOP values.
+It can be concluded that it is possible to inject absolute GNSS positions into the \ac{AQ} M4 board over \ac{CAN}.
+Several tests were made in order to verify the CAN-GNSS injection worked first by doing indoor testing and then testing outside.
+The tests made in appendix \ref{app:test_of_spoofed_GNSS} shows it is possible to inject CAN-GNSS positions into \ac{AQ} and that \ac{AQ} can be told how much its UKF should trust the GNSS positions based on the DOP values.

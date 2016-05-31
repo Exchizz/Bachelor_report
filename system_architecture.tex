@@ -17,7 +17,7 @@ A Logiteh C930 camera\footnote{The camera is used in other courses to track mobi
 
 \subsubsection*{ROS}
 \ac{ROS}\footnote{http://www.ros.org/} is used as middleware on the laptop as inter-process communication. By using ROS it is easier to debug since each node\footnote{Process in \ac{ROS} terminology} can be isolated and debugged without everything has to be connected. \ac{ROS} uses subscriber-publisher pattern which means one or more nodes can produce data, and one or more nodes can consume data. Topic is the term used to define a communication channel between nodes. Nodes producing data are referred to as publishers, and nodes consuming data are referred to as subscribers.
-Furthermore \ac{ROS} supports running nodes distributed across multiple PCs meaning the MarkerLocators can be distributed if more CPU resources are needed when tracking several drones.
+Furthermore \ac{ROS} supports running nodes distributed across multiple PCs meaning the MarkerLocators can be distributed if more CPU resources are needed when tracking several drones. The main focus when designing the system was, that it is scalable so that the design of the system is not causing a limitation of the number of drones that can be controlled by the system.
 The squares shown in the \ac{ROS} section in figure \ref{fig:indoor_information_flow} shows the \ac{ROS} nodes and how they are connected using topics.
 
 
@@ -136,3 +136,6 @@ When a GPGGA/GPRMC nmea \footnote{\url{http://www.gpsinformation.org/dale/nmea.h
 
 Even though the positioning is shown using vision and \ac{RTK-GNSS}, other sources of positioning can be used as well. The same code is running on the \ac{AQ} M4 whether vision or \ac{RTK-GNSS} is used, so if other positioning systems should be used one should implement the \ac{CAN} protocol shown in appendix \ref{app:aq_can_protocol}.
 If using \ac{CAN} is not possible a \ac{RPi} and \ac{CAN}-adapter can be used as intermediate, but then the \textit{serial\_nmea\_node} and \textit{AQ\_msg\_conv} should be replaced.
+
+
+It can be concluded that it is possible to design a indoor and outdoor positioning system using the same \ac{AQ} firmware. The system was designed to be scalable so that more drones can be controlled by the system. By using ROS the system is modular designed so that the behavior of the drones can be changed without the need of replacing or editing other working components of the system. It requires 6 CAN-messages in order to send the required values to \ac{AQ}.
