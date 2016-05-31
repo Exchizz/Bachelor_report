@@ -1,17 +1,18 @@
 \textit{This section describes the overall system architecture indoor as well as outdoor. The section goes in details with the components used and how they are connected. Furthermore it describes the information flow through the system. The design choices and implementation details will be covered later in this chapter.}
 
 The section has been split into two subsections in order to address indoor and outdoor positioning separately.
+%\newpage
 
 \subsection{Indoor} \label{sec:system_architecture_indoor}
-Figure \ref{fig:indoor_information_flow} shows the system architecture for indoor positioning. The laptop detects the drones position using vision, sends it through the ROS nodes and transmits the GPS positions to the drones via WIFI.
-Each drone receives its position and sends it into the M4 flight controller over \ac{CAN}.
+
 \begin{figure}[H]
     \center
-    \includegraphics[width=1\textwidth]{graphics/system_architecture_indoor_all.png}
+    \includegraphics[width=0.92\textwidth]{graphics/system_architecture_indoor_all.png}
     \caption{Diagram showing system architecture when used indoor. The markers used to track the drones is shown below the camera.}
     \label{fig:indoor_information_flow}
 \end{figure} 
-
+Figure \ref{fig:indoor_information_flow} shows the system architecture for indoor positioning. The laptop detects the drones position using vision, sends it through the ROS nodes and transmits the GPS positions to the drones via WIFI.
+Each drone receives its position and sends it into the M4 flight controller over \ac{CAN}.
 A Logiteh C930 camera\footnote{The camera is used in other courses to track mobile robots so the author did not have any influence on which camera to use} was mounted below the ceiling to detect the drones when flying. The order of the marker of each drone is unique in order to identify the particular position of the drone.
 
 

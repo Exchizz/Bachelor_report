@@ -3,36 +3,8 @@
 \subsubsection*{Wireless communication module} \label{sec:wireless_communication_module}
 An important part of the hardware is the wireless communication used between the PC and the drones.
 The wireless communication module has several requirements it needs to fulfill in order to make the whole system work as expected. A comparison table has been made in table \ref{tab:compare_table_wireless_communication} to find the wireless communication module that is best suited for the task. \\
-The following wireless modules where considered and compared.
-\begin{itemize}
-	\item \textbf{ESP8266}
-\end{itemize}
 
-ESP8266 is a generel purpose 32 bit SOC with integrated WIFI 802.11 b/g/n support and buildin TCP/IP stack. It can be setup its own access point or it can connect to an existing wireless network.
-It runs at 80MHz and can be flashed with a custom firmware. 
-The SOC is sold as modules with different pinouts and features such as extra flash memory \footnote{\url{https://www.olimex.com/Products/IoT/MOD-WIFI-ESP8266/open-source-hardware}} and different antennas.
-The chip has been on the marked for about two years and costs approximately 7\$. 
-It has been widely used in DIY-projects due to its low price and because it requires a minimum of network knowledge to get up and running.\footnote{\url{http://www.esp8266.com/} - 43.000 posts in forum} When the SOC is shipped, it comes with a preloaded firmware which either accepts AT commands or LUA scripting depending on the version of the module. These simple programming interfaces makes it quick and easy to interface the cheap. \\
-This leads to a large community where most of the problems have been found and solved already. Arduino has been ported to ESP8266 which makes it even easier to get it up and running. Their official Arduino GitHub has 2125 commits on their master branch at the time of writing\footnote{\url{https://github.com/esp8266/Arduino}} \\
-
-\begin{itemize}
-	\item \textbf{EMW3165}
-\end{itemize}
-EMW3165 is a SOC much like the ESP8266 supporting 802.11 b/g/n WIFI with buildin TCP/IP stack. As with ESP8266 it supports setting up an access point aswell as connecting to an existing network. It has a Cortex-M4 $\mu$C which run at 100MHz. 
-It supports custom firmware and can be aswell be bought as different modules with different pinouts and antennas.
-It differentiates itself from the ESP8266 by its higher frequency its 5 volts compatible pins \footnote{\url{https://hackadaycom.files.wordpress.com/2015/07/emw3165.pdf}} which makes it easier to connect other hardware which run 5 volt without the need of a logic level shifter. It has been on the marked for only one year and costs approximately 9\$. Since it is a newer board than ESP8266 it has not been used in the same number of applications and thereby has a smaller community behind\footnote{\url{http://www.emw3165.com/} - 200 posts in forum }. Their most active GitHub has 147 commits on their master branch at the time of writing\footnote{\url{https://github.com/SmartArduino/WiFiMCU}}.
-
-\begin{itemize}
-	\item \textbf{nRF51822}
-\end{itemize}
-nRF51822 is also a SOC, but it is using Bluetooth instead of WIFI. The nRF51822 $\mu$C is implementing BLE which is a power efficient way of sending and receiving data. The chip supports broadcasting which could be used in this project. The $\mu$C can be bought as a standalone component or mounted on modules as the two other $\mu$Cs. Different modules offers different types of antenna connectors or buildin antenna on the PCB. It has not been possible to find an Arduino ported firmware that supports this $\mu$C. To write a firmware for the $\mu$C it has to be done using Nordic Semiconductor's proprietary SDK. 
-
-
-\begin{itemize}
-	\item \textbf{XBee}
-\end{itemize}
-XBee is a module that implements the Zbee standard. The Xbee modules work as a wireless serial connection. The Xbee modules supports mesh networking which means the modules by themself figure out which module is closest and makes the connection. This idea makes sense in this application since there will be multiple drones and one computer. If one drone gets too far from the PC, it can just connect to one of the other drones closer to the PC.\\
-The Xbee solution is ready to use and requires a minimum of programming to get up and running. The modules also support GPIO for digital in and output and analog input.
+A description of the modules compared can be seen in appendix \ref{app:wireless_decribe}
 
 \begin{savenotes}
 \begin{table}[H]
@@ -122,25 +94,31 @@ This ended up making it easier to program the ESP8266-board without using the At
 Test of the extension-board was done by making small sketches testing the individual parts of the circuit. The sketches used to blink the leds and proof that the basic functionality works is left out. CAN is tested in section \ref{sec:test_of_queues}.
 
 \subsubsection*{Test of WIFI range}
-A test of the WIFI was conducted in order to test the range of the ESP8266 module. 
+Two tests were conducted in order to see how the latency and range behaves when the distance is increased.
+The firmware of the ESP8266 module had to be flashed to specify which access point \footnote{The network configuration is described in section \ref{sec:network_configuration}} it should connect to.
+The test was conducted by increasing the distance between the ESP8266 module and the laptop by 1 meter. 
 
-To make the test, the firmware of the ESP8266 module had to be flashed to specify which access point \footnote{The network configuration is described in  section \ref{sec:network_configuration}} it should connect to.
+After each distance increase, the laptop pinged the ESP8266 module 200 times with 10 hz with a packet size equal to the size of the frame used.
+\footnote{The WIFI frame is described in section \ref{sec:system_architecture_indoor}}.
 The tests were conducted on an open grass field in order to avoid as much disturbance as possible.
-
-The first test was conducted by pinging the module from the authors laptop 200 times, 10 hz with a packet size equal to the size of the frame used.\footnote{The WIFI frame is described in section \ref{sec:system_architecture_indoor}}. The purpose of the test was to see how the latency behaves when the distance is increased and at what distance the  WIFI-connection is dropped.
-
+ 
 Figure \ref{fig:wifi_pingtest} shows the results of the ping test.
 
 \begin{figure}[H]
     \center
     \includegraphics[width=0.9\textwidth]{graphics/wifi_test_latency_1.eps}
-  \caption{Plot shows the latency, packet loss vs. distance. Up until 46 meters no packets are dropped and the latency is quite low.}
+  \caption{Plot shows the average latency, packet loss vs. distance. Up until 46 meters no packets are dropped and the latency is quite low.}
     \label{fig:wifi_pingtest}
 \end{figure}
 
 It can be seen, that until 46 Meters no packets is dropped and the latency is low. From 46 to 69 the latency starts to increase and packets begin to get dropped. At 69 meters and up to 80 meters the latency is high and packet loss percentage is increased. Since ping works by sending a request and waiting for the answer this tests communication both ways. However only one way communication from the laptop to the ESP8266 is required.
 
-Another test was done where the authors laptop sends valid frames\footnote{Frame described in section \ref{sec:system_architecture_indoor}} with CRC\footnote{CRC described in section \ref{sec:extension_board_firmware}} to the ESP8266 module. The tests shows for how long a distance the module can be from the laptop and still receive valid packets. 
+
+The purpose of a second test was to see what happens with the number of valid CRC\footnote{CRC described in section \ref{sec:extension_board_firmware}} frames\footnote{Frame described in section \ref{sec:system_architecture_indoor}} as the distance is increased.
+The distance was increased by 1 meter in the beginning, however to save time it was increased to 5 meters and later 10 meters. 
+When the module started to miss frames or CRC was not verified the distance between tests went down to 5 meter again.
+
+Figure \ref{fig:wifi_crc_check} shows the result.
 
 \begin{figure}[H]
     \center
@@ -164,5 +142,5 @@ Both modules received 200 packets without CRC error
 
 \subsubsection*{Conclusion}
 It can be concluded that the ESP8266 wireless module was chosen based on requirements in table \ref{tab:compare_table_wireless_communication}. The ESP8266 got the highest score and was mainly chosen since it is a widely used module. The extension-board was created based on the block schematic shown in figure \ref{fig:PCB_block}. A At90CAN128 was chosen based on its build-in CAN-controller, it was avilable and it because of previous experience. Three tests was conducted to test the performance of ESP8266 module. If the distance is larger than 46 meters the latency begins to increase and the CRC packets will be arrive without error but will delayed. If the distance is larger than 85 meters the packets suffers from high latency and errors starts to occur.
-
+At a distance of 70 meters packets experience latency up to 1.4 sec. If a frame containing a drones positions arrives 1.4 sec too late it is invalid since the drone could have moved several meters since the frame was sent.
 

@@ -37,7 +37,7 @@ If alignment of the camera-frame with north was not possible, the coordinate fra
 
 In figure \ref{fig:coordinate_flow} the manipulation and control happens in meters but converted back to \ac{LL} in decimal degrees and sent to AQ M4 board.
 
-\subsection{Control and manipulation of drones position}
+\subsection{Control and manipulation of the drones position}
 The initial idea was to send waypoints to the AQ M4-boards, however this usually done by using an extension-board for telemetry mounted on the drones. Since only one extension-board can be mounted on the AQ M4 board, no telemetry was available and is thereby not available to send waypoints when it is airborne. \\
 Instead it was chosen to control the drone by manipulating its belief in where it is.
 If the drone is supposed to fly to the right, its being manipulated to belief it is more to the left than it is in order to make it fly to the right. Eg. the drone is in (x = 0,y = 0) and it has to go to (x = 1, y = 0).
@@ -83,10 +83,10 @@ Top side      & 1.490 & 0.009                   \\ \bottomrule
 \end{tabular}
 \end{table}
 
-By calculating the different in means pairwise and substract that from the actual size of the whiteboard, an error can be estimated.
-Width of whiteboard has an error of 1.2 cm and height has an error of 0.9 cm.
+By calculating the different in means pairwise and subtract that from the actual size of the whiteboard, errors can be estimated.
+The errors is 1.2 cm and 0.9 cm in width and height respectively.
 
-The variance i table \ref{tab:converter_results} expresses how straight the marker has moved along the four sides. It can be seen that the variance is higher in top and bottom of the whiteboard, however this might be caused by the two mountings on the whiteboard causing some anomalies.
+The variance in table \ref{tab:converter_results} expresses how straight the marker has moved along the four sides. It can be seen that the variance is higher in top and bottom of the whiteboard, however this might be caused by the two mountings on the whiteboard causing some anomalies.
 By inspection of \ref{fig:coordinate_test_polot} it can be seen how the red dots start to deviate from the blue lines at the upper-left and bottom-right corners. This indicates the marker was not moved precise enough at the two corners. However the results stated 
 
 

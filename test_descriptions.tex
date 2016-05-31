@@ -1,0 +1,25 @@
+\textit{The following tests were made in order to verify the individual parts was working as expected}
+
+
+\section{WIFI latency and range} \label{sec:test_wifi_range_ping}
+A purpose of the test was to see how the latency and range behaves when the distance is increased.
+The firmware of the ESP8266 module had to be flashed to specify which access point \footnote{The network configuration is described in section \ref{sec:network_configuration}} it should connect to.
+The test was conducted by increasing the distance between the ESP8266 module and the laptop by 1 meter. After each distance increase, the laptop pinged the ESP8266 module 200 times with 10 hz with a packet size equal to the size of the frame used.\footnote{The WIFI frame is described in section \ref{sec:system_architecture_indoor}}. 
+The tests were conducted on an open grass field in order to avoid as much disturbance as possible.
+
+
+\section{WIFI range with CRC} \label{sec:test_wifi_range_crc}
+The purpose of a second test was to see what happens with the number of valid CRC\footnote{CRC described in section \ref{sec:extension_board_firmware}} frames\footnote{Frame described in section \ref{sec:system_architecture_indoor}} as the distance is increased.
+The distance was increased by 1 meter in the beginning, however to save to it was increased to 5 meters and later 10 meters. However then the module started to miss frames or CRC was not verified the distance between tests went down to 5 meter again.
+
+
+\section{WIFI with two extension-boards}
+The purpose of this test was to see if two ESP8266 modules can receive frames from a laptop at 10 hz, 200 times at a distance of 10 meters when they are receiving at the same time.
+Unfortunately only one connector to communicate with the extension-board were made which made it difficult to check if both extension-boards received the data without error at the same time. The test was done 4 times while alternating between the modules to verify both modules were receiving all the packets.\footnote{If more time were available, a timing-test of the setup would have been done. By measuring the time it takes one drones to receive 200 packets, do the same test but when two drones each receiving 200 packets.}
+
+\begin{figure}[H]
+    \centering
+        \includegraphics[width=0.5\textwidth]{graphics/laptop_extenbioard_crc_check}
+        \caption{Test setup where two modules receives 200 frames at 10 hz at the same time. It can be seen that the laptop only checks the received number of frames one extension-board at a time.}
+        \label{fig:wifi_two_modules_check}
+\end{figure}
