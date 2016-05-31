@@ -105,13 +105,14 @@ By creating four markers with known distance to each other at the expected fligh
 Figure \ref{fig:whiteboard_setup} shows the setup used. A picture was taken from the ceiling-camera and the four black corners of the whiteboard could be found in the frame. The distance between the black corners in centimeters and the distance in px is given as input to the perspective correcter. The locations of markers is then transformed into the plane made by the whiteboard. Depending on where the whiteboard is placed in the frame origin can be placed. The placement of the coordinate system can be seen in section \ref{sec:control_and_coordinate_conversion}\\
 
 
-A test was conducted to get the accuracy of the MarkerLocator. Two markers with order 4 and 6 was placed at the expected flight-height and the distance between the two markers was calculated using Pythagoras.\\
-This was done with distance 60 centimeters measured using a ruler. 
-The real distance measured by a ruler was 60 cm and and the MarkerLocator gave 59.19.\footnote{To obtain a better estimate of the positioning, this test should have been done multiple times. However due to lack of time this was only done once.}
+A test was conducted to test the homography. Two markers with order 4 and 6 was placed at the expected flight-height and the distance between the two markers was calculated using Pythagoras. 
+The real distance measured by a ruler was 60 cm and and the MarkerLocator gave 59.19.
+Section \ref{sec:control_and_coordinate_conversion} tests the localization more in depth as part of the coordinate conversion.
 
 Another test was conducted in order to see how stable the MarkerLocator is. 547 position detections was done while the marker was placed steady at the flight height. It shows a mean position in x of -8.1487 with variance of 0, y position with mean -39.5046 and variance 0. \\
 
-Some of this inaccuracy is caused by measuring error and placing of the whiteboard. If higher accuracy is needed this should be done again more carefully.
+Some of the inaccuracy of the MarkerLocator is caused by error when measuring the distance between the corners of the whiteboard and finding the corners in the frame.
+If higher accuracy is needed this should be done again more carefully.
 
-It can be concluded that using the MarkerLocator with the improved order detection it is possible to detect two drones without having false positive/negative. By making a test of the distance between two markers there is an error of 0.81 cm. The MarkerLocator seems stable with a variance of zero. 
+It can be concluded that using the MarkerLocator with the improved order detection it is possible to detect two drones without having false positive/negative. By making a test of the distance between two markers there is an error of 0.81 cm. The MarkerLocator seems precise with a variance of zero. 
 

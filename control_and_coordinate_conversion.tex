@@ -42,5 +42,46 @@ Instead it was chosen to control the drone by manipulating its belief in where i
 If the drone is supposed to fly to the right, its being manipulated to belief it is more to the left than it is in order to make it fly to the right. Eg. the drone is in (x = 0,y = 0) and it has to go to (x = 1, y = 0).
 Instead of giving it a waypoint telling it to go to 1,0, it is told that its position is (-1,0) and thereby gets tricked into flying to (1,0). In order for this to work, the AutoQuad M4 should be in \textit{Position-Hold}-mode which is set by a switch on the transmitter.
 
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{graphics/coordincate_conversion_test.eps}
+        \caption{Blue square is the whiteboard seen in figure \ref{fig:convert_test}. The red dots is output in \ac{LL} converted to UTM to be plotted}
+        \label{fig:coordinate_test_polot}
+    \end{subfigure}
+    ~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc. 
+      %(or a blank line to force the subfigure onto a new line)
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=0.95\textwidth]{graphics/coordinate_test_setup.png}
+        \caption{A 4 order marker held along the edge of the whiteboard all the way around. The size of the whiteboard is 118.5cm*148.5 cm}
+        \label{fig:convert_test}
+    \end{subfigure}
+\end{figure}
 
+Figure \ref{fig:coordinate_test_polot} shows a blue square representing the whiteboard shown in figure \ref{fig:convert_test}. The anomalies shown in the top and bottom of the square is caused by the mountings holding the whiteboard. The software setup used to track the marker is shown in figure \ref{sec:indoor_localization}.
+In this test, the \textit{Decision\_Maker} was programmed to le the output position be equal to the input position.
+By doing this, it makes it possible to simply plot the position of the drone. Instead of transmitting the \ac{LL} frames to the drone they were logged and converted back to UTM in order to be drawn together with the blue square.
+The lines were analyzed independently in order to see how well the fit a line. Since the whiteboards sides are straight lines, it was expected to see the marker moved along straight lines as well.
+
+
+\begin{table}[H]
+\centering
+\caption{Results from positions obtaining by moving marker along the edge of whiteboard}
+\label{tab:converter_results}
+\begin{tabular}{@{}|l|l|l|@{}}
+\toprule
+\textbf{Side} & \textbf{Mean [M]}  & \textbf{Std. Deviation {[}M{]}} \\ \midrule
+Left side     & 0.004 & 0.13                   \\ \midrule
+Bottom side   & 0.014 & 0.01                   \\ \midrule
+Right side    & 0.009 & 0.14                   \\ \midrule
+Top side      & 0.017 & 0.25                   \\ \bottomrule
+\end{tabular}
+\end{table}
+
+It can be seen in table \ref{tab:converter_results} how close to straight lines the marker was moved. The offset of each line was removed to get a mean close to zero. It can be seen the means of the bottom and top lines are higher than of the left and right side. this is probably due to the two mounting on the whiteboard. It can be seen how the dots diviate from the line in the middle of the lines. By inspection of \ref{fig:coordinate_test_polot} it can be seen how the red dots start to deviate from the blue lines at the upper-left and bottom-right corners. This might be because of the markers  ot moved to the corners of the whiteboard. Since the camera is not calibrated it might be caused by distortion. This would explain why his only happens at the ends furthermost lines.
+
+It can be concluded that converting from a pixel location  to a \ac{LL}
+
+
+...
 A more generic design of the \textit{Decision\_Maker} would have been to split the current \textit{Decision\_Maker} into three nodes in order to avoid doing coordinate conversation within each \textit{Decision\_Maker} node. A node before the \textit{Decision\_Maker} to handle camera-frame transformation and a node after to convert the coordinates to \ac{LL}.
